@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "744771126305",
+    "firebase_url": "https://hereiam-c7f82.firebaseio.com",
+    "project_id": "hereiam-c7f82",
+    "storage_bucket": "hereiam-c7f82.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:744771126305:android:7f61535809a97175",
+        "android_client_info": {
+          "package_name": "com.ziegler.hereiam"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "744771126305-pb05g7ga8u555ajlsu4aa424fio4qm8r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxJt8ZWVzO7nqtGX77uClJfwRFCIca5Ig"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
