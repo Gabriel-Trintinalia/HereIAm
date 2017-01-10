@@ -31,9 +31,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        final String userID = FirebaseUtil.getCurrentUserId();
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setReverseLayout(true);
@@ -42,12 +43,10 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-
-        Query allPostsQuery = FirebaseUtil.getBaseRef().child("people").child("teste").child("rooms");
+        Query allPostsQuery = FirebaseUtil.getBaseRef().child("people").child(userID).child("rooms");
         mAdapter = getFirebaseRecyclerAdapter(allPostsQuery);
 
         mRecyclerView.setAdapter(mAdapter);
-
 
         // adapter.addFragment(new EarningsFragment(), "EARNINGS");
 
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
 
                         String srt = input.getEditableText().toString();
-                        FirebaseUtil.createRoom("teste", srt);
+                        FirebaseUtil.createRoom(userID, srt);
                     } // End of onClick(DialogInterface dialog, int whichButton)
                 }); //End of alert.setPositiveButton
 
