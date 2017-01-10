@@ -47,7 +47,6 @@ public class MainActivity extends AppCompatActivity {
         mAdapter = getFirebaseRecyclerAdapter(allPostsQuery);
 
         mRecyclerView.setAdapter(mAdapter);
-
         // adapter.addFragment(new EarningsFragment(), "EARNINGS");
 
 

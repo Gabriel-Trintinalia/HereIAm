@@ -14,7 +14,6 @@
     <string name="project_id">friendlypix-4fa22</string>
     <string name="title_activity_welcome">FriendlyPix</string>
 
-
     <string name="welcome_screen_text">Here I am</string>
     <string name="sign_in_button_text">sign in with Google</string>
 
@@ -39,11 +38,10 @@
     <string name="NEW_DOC_KEY">NEW_DOC_KEY</string>
 
 
-    <string name="facebook_app_id">350228468674370</string>
+    <string name="facebook_app_id">210319032763741</string>
     <string name="fb_login_protocol_scheme">fb350228468674370</string>
     <string name="sign_in_with_facebook">SIGN IN WITH FACEBOOK</string>
     <string name="title_list_training">Training</string>
     <string name="FILE_LOCATION">FILE_LOCATION</string>
-
 
 </resources>
