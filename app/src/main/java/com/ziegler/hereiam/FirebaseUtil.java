@@ -2,9 +2,12 @@ package com.ziegler.hereiam;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.ziegler.hereiam.Models.Room;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -195,6 +198,40 @@ public class FirebaseUtil {
                         }
                     }
                 });
+    }
+
+    public static void joinRoom(final String user, final String roomKey) {
+
+        FirebaseUtil.getBaseRef().child("rooms").child(roomKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Room room = dataSnapshot.getValue(Room.class);
+                if (room == null) return;
+
+                Map<String, Object> updateValues = new HashMap<>();
+                updateValues.put("people/" + user + "/rooms/" + roomKey + "/name", room.getName());
+                updateValues.put("rooms/" + roomKey + "/people/ " + user, true);
+
+                FirebaseUtil.getBaseRef().updateChildren(updateValues,
+                        new DatabaseReference.CompletionListener() {
+                            @Override
+                            public void onComplete(DatabaseError firebaseError, final DatabaseReference databaseReference) {
+                                if (firebaseError != null) {
+                                } else {
+                                }
+                            }
+                        });
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+
     }
 
 

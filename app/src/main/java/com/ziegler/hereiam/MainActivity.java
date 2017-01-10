@@ -17,6 +17,11 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.Query;
 import com.ziegler.hereiam.Models.RoomItemList;
 
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -115,10 +120,41 @@ public class MainActivity extends AppCompatActivity {
 
                 String roomKey = ((FirebaseRecyclerAdapter) mAdapter).getRef(position).getKey();
                 room.putExtra(getString(R.string.EVENT_KEY), roomKey);
+                shareRoom(roomKey);
 
-                startActivity(room);
+                //startActivity(room);
             }
         });
 
     }
+
+    private void shareRoom(String keyRoom) {
+
+        String dld = getString(R.string.DynamicLinkDomain);
+        String link = "https://james-1b462.firebaseapp.com/room/?cod=";
+
+        String pck = "&apn=com.ziegler.hereiam";
+        String url = null;
+        URL urla = null;
+        try {
+            url = dld + "?link=" + link + keyRoom.replace("-", "%2D") + pck;
+
+
+            URI uri = new URI(url);
+            urla = uri.toURL();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, urla.toString());
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "teste"));
+
+    }
+
 }

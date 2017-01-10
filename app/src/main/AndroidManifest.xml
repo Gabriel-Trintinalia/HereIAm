@@ -37,6 +37,23 @@
         <activity android:name=".MapActivity" />
         <activity android:name=".MainActivity" />
 
+        <activity android:name=".ProcessLinkActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="james-1b462.firebaseapp.com"
+                    android:scheme="http" />
+                <data
+                    android:host="james-1b462.firebaseapp.com"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+
+
     </application>
 
 </manifest>

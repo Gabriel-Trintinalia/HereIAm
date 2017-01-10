@@ -43,5 +43,6 @@
     <string name="sign_in_with_facebook">SIGN IN WITH FACEBOOK</string>
     <string name="title_list_training">Training</string>
     <string name="FILE_LOCATION">FILE_LOCATION</string>
+    <string name="DynamicLinkDomain">https://f22xa.app.goo.gl/</string>
 
 </resources>
