@@ -4,13 +4,13 @@
     <string name="label_events">Events</string>
 
 
-    <string name="server_client_id">85010793512-5t8ejsijkp68vgudb9jn00ct1tnrgoac.apps.googleusercontent.com</string>
+    <string name="server_client_id">744771126305-pb05g7ga8u555ajlsu4aa424fio4qm8r.apps.googleusercontent.com</string>
     <string name="server_widget_url">http://www.google.com</string>
 
 
     <!-- Content Description for images -->
     <string name="desc_google_icon">Google Logo</string>
-    <string name="server_client_id_web">85010793512-guh26t71dh519hp1il371it4bq4kil0h.apps.googleusercontent.com</string>
+    <string name="server_client_id_web">744771126305-pb05g7ga8u555ajlsu4aa424fio4qm8r.apps.googleusercontent.com</string>
     <string name="project_id">friendlypix-4fa22</string>
     <string name="title_activity_welcome">FriendlyPix</string>
 
@@ -26,7 +26,7 @@
     <string name="post_upload_progress_message">Uploading...</string>
     <string name="user_logged_out_error">You must be logged in to do that.</string>
     <string name="error_user_not_signed_in">Error user not signed in.</string>
-    <string name="web_client_id">434382800525-ni6d6pj7n46312g7q9ld9ir7l0fnugao.apps.googleusercontent.com</string>
+    <string name="web_client_id">744771126305-pb05g7ga8u555ajlsu4aa424fio4qm8r.apps.googleusercontent.com</string>
     <string name="about_text">\"There\'s a place where the sun shines brighter… \n\n There\'s a mountain that climbs to the stars…\"</string>
     <string name="about_version">"Version "</string>
     <string name="transition_icon">transition_icon</string>
