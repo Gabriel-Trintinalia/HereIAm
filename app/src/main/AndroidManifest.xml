@@ -34,8 +34,13 @@
         </activity>
 
 
-        <activity android:name=".MapActivity" />
+        <activity
+            android:name=".MapActivity"
+            android:label="" />
+
         <activity android:name=".MainActivity" />
+        <activity android:name=".RoomDetailActivity" />
+
 
         <activity android:name=".ProcessLinkActivity">
             <intent-filter>

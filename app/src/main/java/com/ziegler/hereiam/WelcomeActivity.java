@@ -193,7 +193,6 @@ public class WelcomeActivity extends BaseActivity implements View.OnClickListene
         Map<String, Object> updateValues = new HashMap<>();
         updateValues.put("full_name", firebaseUser.getDisplayName() != null ? firebaseUser.getDisplayName() : "Anonymous");
         updateValues.put("profile_picture", firebaseUser.getPhotoUrl() != null ? firebaseUser.getPhotoUrl().toString() : null);
-        updateValues.put("email", firebaseUser.getEmail() != null ? firebaseUser.getEmail() : null);
 
         FirebaseUtil.getPeopleRef().child(firebaseUser.getUid()).updateChildren(
                 updateValues,
@@ -317,31 +316,4 @@ public class WelcomeActivity extends BaseActivity implements View.OnClickListene
                 });
     }
 
-
-    /*private void checkPerson(Person person, DatabaseReference databaseReference) {
-
-                            Map<String, Object> updateValues = new HashMap<>();
-
-                            Boolean mustUpdate = false;
-
-                            if (person.getSit_training() == null) {
-                                updateValues.put("sit_training", "new");
-                                mustUpdate = true;
-                            }
-
-                            if (mustUpdate) {
-                                databaseReference.updateChildren(
-                                        updateValues,
-                                        new DatabaseReference.CompletionListener() {
-                                            @Override
-                                            public void onComplete(DatabaseError firebaseError, DatabaseReference databaseReference) {
-                                                if (firebaseError != null) {
-                                                    Toast.makeText(WelcomeActivity.this,
-                                                            "Couldn't save user data: " + firebaseError.getMessage(),
-                                                            Toast.LENGTH_LONG).show();
-                                                }
-                        }
-                    });
-        }
-    }*/
 }

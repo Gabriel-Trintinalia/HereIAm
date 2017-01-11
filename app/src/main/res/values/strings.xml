@@ -44,5 +44,6 @@
     <string name="title_list_training">Training</string>
     <string name="FILE_LOCATION">FILE_LOCATION</string>
     <string name="DynamicLinkDomain">https://f22xa.app.goo.gl/</string>
+    <string name="NAME_ROOM">NAME_ROOM</string>
 
 </resources>

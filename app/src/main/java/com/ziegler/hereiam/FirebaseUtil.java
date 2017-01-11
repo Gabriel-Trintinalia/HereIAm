@@ -180,14 +180,22 @@ public class FirebaseUtil {
     }*/
 
 
-    public static void createRoom(String owner, String roomName) {
+    public static void createRoom(String roomName) {
+
+        String owner = FirebaseUtil.getCurrentUserId();
+        String picture = FirebaseUtil.getCurrentPhotoUrl();
+        String name = FirebaseUtil.getCurrentDisplayName();
+
 
         String roomKey = FirebaseUtil.getBaseRef().child("rooms").push().getKey();
         Map<String, Object> updateValues = new HashMap<>();
         updateValues.put("people/" + owner + "/rooms/" + roomKey + "/name", roomName);
         updateValues.put("rooms/" + roomKey + "/name", roomName);
         updateValues.put("rooms/" + roomKey + "/owner", owner);
-        updateValues.put("rooms/" + roomKey + "/people/ " + owner, true);
+
+        updateValues.put("rooms/" + roomKey + "/people/ " + owner + "/name", name);
+        updateValues.put("rooms/" + roomKey + "/people/ " + owner + "/picture", picture);
+
 
         FirebaseUtil.getBaseRef().updateChildren(updateValues,
                 new DatabaseReference.CompletionListener() {
@@ -212,6 +220,8 @@ public class FirebaseUtil {
                 Map<String, Object> updateValues = new HashMap<>();
                 updateValues.put("people/" + user + "/rooms/" + roomKey + "/name", room.getName());
                 updateValues.put("rooms/" + roomKey + "/people/ " + user, true);
+                updateValues.put("rooms/" + roomKey + "/people/ " + user, true);
+
 
                 FirebaseUtil.getBaseRef().updateChildren(updateValues,
                         new DatabaseReference.CompletionListener() {
@@ -229,7 +239,6 @@ public class FirebaseUtil {
 
             }
         });
-
 
 
     }

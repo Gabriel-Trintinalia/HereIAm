@@ -6,6 +6,8 @@ package com.ziegler.hereiam.Models;
 
 public class RoomItemList {
     private String name;
+    private String picture;
+
 
     public RoomItemList() {
     }
@@ -13,5 +15,9 @@ public class RoomItemList {
     public String getName() {
         return name;
 
+    }
+
+    public String getPicture() {
+        return picture;
     }
 }

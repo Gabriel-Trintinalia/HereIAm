@@ -73,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(DialogInterface dialog, int whichButton) {
 
                         String srt = input.getEditableText().toString();
-                        FirebaseUtil.createRoom(userID, srt);
+                        FirebaseUtil.createRoom(srt);
                     } // End of onClick(DialogInterface dialog, int whichButton)
                 }); //End of alert.setPositiveButton
 
@@ -120,9 +120,11 @@ public class MainActivity extends AppCompatActivity {
 
                 String roomKey = ((FirebaseRecyclerAdapter) mAdapter).getRef(position).getKey();
                 room.putExtra(getString(R.string.EVENT_KEY), roomKey);
-                shareRoom(roomKey);
+                room.putExtra(getString(R.string.NAME_ROOM), roomItemList.getName());
 
-                //startActivity(room);
+                // shareRoom(roomKey);
+
+                startActivity(room);
             }
         });
 
@@ -138,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
         URL urla = null;
         try {
             url = dld + "?link=" + link + keyRoom.replace("-", "%2D") + pck;
-
 
             URI uri = new URI(url);
             urla = uri.toURL();

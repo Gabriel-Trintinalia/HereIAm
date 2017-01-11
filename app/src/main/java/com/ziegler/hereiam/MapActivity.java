@@ -2,8 +2,12 @@ package com.ziegler.hereiam;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -23,6 +27,8 @@ import java.util.HashMap;
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "MainActivity";
     private String roomKey;
+    private String roomName;
+
     private GoogleMap mMap;
     private Toolbar toolbar;
 
@@ -36,20 +42,36 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        toolbar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent room = new Intent(MapActivity.this, RoomDetailActivity.class);
+                room.putExtra(getString(R.string.EVENT_KEY), roomKey);
+
+                startActivity(room);
+            }
+        });
+
+
         Intent intent = getIntent();
         roomKey = intent.getStringExtra(getString(R.string.EVENT_KEY));
+        roomName = intent.getStringExtra(getString(R.string.NAME_ROOM));
+
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
+        ActionBar ab = getSupportActionBar();
+        ab.setDisplayHomeAsUpEnabled(true);
+
+
         mapFragment.getMapAsync(MapActivity.this);
-
-
+        toolbar.setTitle(roomName);
     }
 
     @Override
     public void onMapReady(GoogleMap map) {
-
         mMap = map;
         //mMap.setMyLocationEnabled(true);
         LatLng loc = new LatLng(-37.837329, 144.986561);
@@ -58,8 +80,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         FirebaseUtil.getBaseRef().child("rooms").child(roomKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                toolbar.setTitle(roomName);
                 Room room = dataSnapshot.getValue(Room.class);
-                toolbar.setTitle(room.getName());
                 addPeople(room, roomKey);
             }
 
@@ -103,5 +125,23 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 }
             });
         }
+    }
+
+    // Menu icons are inflated just as they were with actionbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.map_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity (if there is any)
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
