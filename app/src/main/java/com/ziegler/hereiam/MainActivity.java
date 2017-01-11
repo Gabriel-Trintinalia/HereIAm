@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, urla.toString());
         sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent, "teste"));
+        startActivity(Intent.createChooser(sendIntent, "Share with..."));
 
     }
 
