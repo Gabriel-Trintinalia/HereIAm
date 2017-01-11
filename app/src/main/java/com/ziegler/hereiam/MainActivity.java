@@ -10,10 +10,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Query;
 import com.ziegler.hereiam.Models.RoomItemList;
 
@@ -157,5 +160,27 @@ public class MainActivity extends AppCompatActivity {
         startActivity(Intent.createChooser(sendIntent, "teste"));
 
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == R.id.action_sign_out) {
+            FirebaseAuth.getInstance().signOut();
+            Intent login = new Intent(MainActivity.this, WelcomeActivity.class);
+            startActivity(login);
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
 }
