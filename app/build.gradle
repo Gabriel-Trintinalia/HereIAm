@@ -34,6 +34,7 @@ dependencies {
     compile 'com.android.support:percent:25.0.1'
     compile 'com.google.android.gms:play-services-maps:9.6.1'
     compile 'com.google.android.gms:play-services-auth:9.6.1'
+    compile 'com.google.android.gms:play-services-location:9.6.1'
     compile 'com.google.firebase:firebase-storage:9.6.1'
     compile 'com.google.firebase:firebase-common:9.6.1'
     compile 'com.google.firebase:firebase-auth:9.6.1'

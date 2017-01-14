@@ -7,6 +7,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.ziegler.hereiam.Models.Location;
 import com.ziegler.hereiam.Models.Room;
 
 import java.util.HashMap;
@@ -241,6 +242,19 @@ public class FirebaseUtil {
         });
 
 
+    }
+
+    public static void postLocation(android.location.Location location) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            Location loc = new Location(location);
+
+            loc.setPicture(FirebaseUtil.getCurrentPhotoUrl());
+            loc.setName(FirebaseUtil.getCurrentDisplayName());
+
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+            ref.child("locations").child(FirebaseUtil.getCurrentUserId()).setValue(loc);
+        }
     }
 
 

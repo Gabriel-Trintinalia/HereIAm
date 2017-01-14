@@ -8,7 +8,7 @@ public class Location {
 
     private String picture;
     private String name;
-
+    private float bearing;
     private Double latitude;
     private Double longitude;
 
@@ -46,4 +46,22 @@ public class Location {
     public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
+
+    public float getBearing() {
+        return bearing;
+    }
+
+    public void setBearing(float bearing) {
+        this.bearing = bearing;
+    }
+
+
+    public Location(android.location.Location loc) {
+        if (loc != null) {
+            this.bearing = loc.getBearing();
+            this.latitude = loc.getLatitude();
+            this.longitude = loc.getLongitude();
+        }
+    }
+
 }

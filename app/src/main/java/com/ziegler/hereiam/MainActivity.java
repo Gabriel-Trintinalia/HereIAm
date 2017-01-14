@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         // adapter.addFragment(new EarningsFragment(), "EARNINGS");
 
 
+
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        startService(new Intent(this, LocationManager.class));
     }
 
 
@@ -126,11 +128,9 @@ public class MainActivity extends AppCompatActivity {
                 room.putExtra(getString(R.string.NAME_ROOM), roomItemList.getName());
 
                 // shareRoom(roomKey);
-
                 startActivity(room);
             }
         });
-
     }
 
     private void shareRoom(String keyRoom) {
@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(login);
             finish();
         }
+
 
         return super.onOptionsItemSelected(item);
     }
