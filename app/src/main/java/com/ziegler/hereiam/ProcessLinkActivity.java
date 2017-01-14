@@ -12,6 +12,8 @@ import com.google.android.gms.appinvite.AppInviteReferral;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -44,38 +46,30 @@ public class ProcessLinkActivity extends BaseActivity implements GoogleApiClient
                                     Intent intent = result.getInvitationIntent();
                                     String deepLink = AppInviteReferral.getDeepLink(intent);
 
-
                                     try {
                                         URL url = new URL(deepLink);
-                                        Log.d(TAG, url.getQuery());
+                                        String roomKey = url.getQuery();
+                                        Log.d(TAG, roomKey);
 
+                                        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                        if (user == null) {
+                                            Intent welcome = new Intent(ProcessLinkActivity.this, WelcomeActivity.class);
+                                            startActivity(welcome);
+                                        } else {
+                                            Log.d(TAG, "Join room ");
+
+                                            FirebaseUtil.joinRoom(user.getUid(), roomKey);
+                                        }
                                     } catch (MalformedURLException e) {
                                         e.printStackTrace();
                                     }
+                                    finish();
 
-
-                                    // Handle
-                                    // the deep link. For example, open the linked
-                                    // content, or apply promotional credit to the user's
-                                    // account.
-
-                                    // ...
                                 } else {
                                     Log.d(TAG, "getInvitation: no deep link found.");
                                 }
                             }
                         });
-
-     /*   FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-
-        if (user == null) {
-            Intent welcome = new Intent(this, WelcomeActivity.class);
-            startActivity(welcome);
-        } else {
-            FirebaseUtil.joinRoom(user.getUid(), "-Ka4q2Z0BgFcdxoOZ_Na");
-        }
-
-        finish();*/
     }
 
     @Override

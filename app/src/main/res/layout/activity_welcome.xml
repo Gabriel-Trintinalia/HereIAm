@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
     tools:context="com.ziegler.hereiam.WelcomeActivity">
 
     <LinearLayout
@@ -35,7 +36,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/sign_in_with_facebook" />
-
 
         <com.facebook.login.widget.LoginButton
             android:id="@+id/login_button"

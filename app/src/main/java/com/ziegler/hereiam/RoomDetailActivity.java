@@ -1,21 +1,27 @@
 package com.ziegler.hereiam;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.firebase.database.Query;
 import com.ziegler.hereiam.Models.RoomItemList;
 
 
 public class RoomDetailActivity extends AppCompatActivity {
     private static final String TAG = "ROOMDETAILACTIVITY";
+    private static final int REQUEST_INVITE = 987;
 
 
     private Toolbar toolbar;
@@ -29,28 +35,51 @@ public class RoomDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room_detail);
 
+        Intent intent = getIntent();
+        roomKey = intent.getStringExtra(getString(R.string.EVENT_KEY));
+
+        setRecycler();
+        setActionBar();
+        setComponents();
+    }
+
+    private void setComponents() {
+
+        LinearLayout buttonAddPeople = (LinearLayout) findViewById(R.id.button_add_people);
+        LinearLayout buttonExitMap = (LinearLayout) findViewById(R.id.button_exit_map);
+
+        buttonAddPeople.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                        .setMessage(getString(R.string.invitation_message))
+                        .setDeepLink(Uri.parse("https://hereiam-c7f82.firebaseio.com/rooms/?" + roomKey))
+                        //  .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+                        .setCallToActionText("Join")
+                        .build();
+                startActivityForResult(intent, REQUEST_INVITE);
+            }
+        });
+    }
+
+
+    private void setActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
+    }
 
+    private void setRecycler() {
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         mRecyclerView = (RecyclerView) findViewById(R.id.room_detail_recycler_view);
-
         mRecyclerView.setLayoutManager(linearLayoutManager);
-
-
-        Intent intent = getIntent();
-        roomKey = intent.getStringExtra(getString(R.string.EVENT_KEY));
 
         Query allPostsQuery = FirebaseUtil.getBaseRef().child("rooms").child(roomKey).child("people");
         mAdapter = getFirebaseRecyclerAdapter(allPostsQuery);
-
         mRecyclerView.setAdapter(mAdapter);
-
     }
 
 
@@ -84,5 +113,24 @@ public class RoomDetailActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode);
+
+        if (requestCode == REQUEST_INVITE) {
+            if (resultCode == RESULT_OK) {
+                // Get the invitation IDs of all sent messages
+                String[] ids = AppInviteInvitation.getInvitationIds(resultCode, data);
+                for (String id : ids) {
+                    Log.d(TAG, "onActivityResult: sent invitation " + id);
+                }
+            } else {
+                // Sending failed or it was canceled, show failure message to the user
+                // ...
+            }
+        }
     }
 }

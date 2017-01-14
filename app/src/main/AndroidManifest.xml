@@ -50,10 +50,10 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="james-1b462.firebaseapp.com"
+                    android:host="hereiam-c7f82.firebaseio.com"
                     android:scheme="http" />
                 <data
-                    android:host="james-1b462.firebaseapp.com"
+                    android:host="hereiam-c7f82.firebaseio.comm"
                     android:scheme="https" />
             </intent-filter>
         </activity>

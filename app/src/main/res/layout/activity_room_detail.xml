@@ -63,28 +63,32 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="#fff"
-                android:paddingLeft="16dp"
+
                 android:paddingTop="16dp">
 
                 <TextView
                     android:id="@+id/label_participants"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginLeft="16dp"
                     android:text="Participants"
                     android:textColor="@color/colorAccent"
                     android:textSize="16sp" />
 
                 <LinearLayout
+                    android:id="@+id/button_add_people"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:layout_below="@id/label_participants"
-                    android:layout_marginLeft="4dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
                     android:gravity="center">
 
                     <ImageView
                         android:id="@+id/icon_add_participant"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
+                        android:layout_marginLeft="16dp"
                         android:src="@drawable/ic_add_person"
                         android:tint="@color/secondary_text" />
 
@@ -106,29 +110,37 @@
                 android:layout_height="match_parent"
                 android:scrollbars="vertical" />
 
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:layout_marginTop="16dp"
-                android:background="#fff"
-                android:gravity="center">
+                android:background="#fff">
 
-                <ImageView
-                    android:id="@+id/leave_room_con"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginLeft="20dp"
-                    android:src="@drawable/ic_exit_group"
-                    android:tint="@color/secondary_text" />
-
-                <TextView
+                <LinearLayout
+                    android:id="@+id/button_exit_map"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="48dp"
-                    android:text="Exit map"
-                    android:textColor="@color/secondary_text"
-                    android:textSize="16sp" />
+                    android:layout_height="match_parent"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:gravity="center">
 
+                    <ImageView
+                        android:id="@+id/leave_room_con"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginLeft="20dp"
+                        android:src="@drawable/ic_exit_group"
+                        android:tint="@color/warn_button" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="48dp"
+                        android:text="Exit map"
+                        android:textColor="@color/warn_button"
+                        android:textSize="16sp" />
+                </LinearLayout>
             </LinearLayout>
 
         </LinearLayout>

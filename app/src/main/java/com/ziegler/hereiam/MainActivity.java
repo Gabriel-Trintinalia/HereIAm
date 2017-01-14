@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         // adapter.addFragment(new EarningsFragment(), "EARNINGS");
 
 
-
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
             @Override
