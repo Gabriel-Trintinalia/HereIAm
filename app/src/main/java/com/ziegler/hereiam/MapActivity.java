@@ -26,6 +26,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.ziegler.hereiam.Models.Location;
+import com.ziegler.hereiam.Models.Person;
 import com.ziegler.hereiam.Models.Room;
 
 import java.util.HashMap;
@@ -49,7 +50,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -60,11 +60,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
 
-
         Intent intent = getIntent();
         roomKey = intent.getStringExtra(getString(R.string.EVENT_KEY));
         roomName = intent.getStringExtra(getString(R.string.NAME_ROOM));
-
 
         SupportMapFragment mapFragment =
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
@@ -72,9 +70,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         ActionBar ab = getSupportActionBar();
         ab.setDisplayHomeAsUpEnabled(true);
 
-
         mapFragment.getMapAsync(MapActivity.this);
         toolbar.setTitle(roomName);
+
     }
 
     @Override
@@ -214,4 +212,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        checkRoomAvailable();
+    }
+
+    private void checkRoomAvailable() {
+
+        FirebaseUtil.getBaseRef().child("people").child(FirebaseUtil.getCurrentUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Person person = dataSnapshot.getValue(Person.class);
+
+                if (!person.getRooms().containsKey(roomKey))
+                    finish();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
 }

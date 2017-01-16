@@ -1,9 +1,11 @@
 package com.ziegler.hereiam;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -60,6 +62,34 @@ public class RoomDetailActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_INVITE);
             }
         });
+
+        buttonExitMap.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                       /* Alert Dialog Code Start*/
+                AlertDialog.Builder alert = new AlertDialog.Builder(RoomDetailActivity.this);
+                alert.setTitle("Exit Map"); //Set Alert dialog title here
+
+                alert.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        FirebaseUtil.exitRoom(FirebaseUtil.getCurrentUserId(), roomKey);
+                        finish();
+
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        dialog.cancel();
+                    }
+                });
+                AlertDialog alertDialog = alert.create();
+                alertDialog.show();
+
+            }
+        });
+
     }
 
 

@@ -125,6 +125,26 @@ public class FirebaseUtil {
         });
     }
 
+
+    public static void exitRoom(final String user, final String roomKey) {
+
+
+        Map<String, Object> updateValues = new HashMap<>();
+        updateValues.put("people/" + user + "/rooms/" + roomKey, null);
+        updateValues.put("rooms/" + roomKey + "/people/ " + user, null);
+
+        FirebaseUtil.getBaseRef().updateChildren(updateValues,
+                new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError firebaseError, final DatabaseReference databaseReference) {
+                        if (firebaseError != null) {
+                        } else {
+                        }
+                    }
+                });
+    }
+
+
     public static void postLocation(android.location.Location location) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
