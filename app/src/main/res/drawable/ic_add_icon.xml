@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="150dp"
+    android:height="150dp"
+    android:viewportWidth="150"
+    android:viewportHeight="150">
+
+    <path
+        android:fillColor="#C5CAE9"
+        android:strokeColor="#C5CAE9"
+        android:strokeWidth="1.14"
+        android:strokeLineJoin="round"
+        android:pathData="M 75 10 C 110.898508739 10 140 39.101491261 140 75 C 140 110.898508739 110.898508739 140 75 140 C 39.101491261 140 10 110.898508739 10 75 C 10 39.101491261 39.101491261 10 75 10 Z" />
+    <path
+        android:fillColor="#fff"
+        android:pathData="M105,54.49H84.17V53.27a4.5,4.5,0,0,0-4.51-4.51H70.33a4.51,4.51,0,0,0-4.5,4.51v1.22H54.92a2.76,2.76,0,0,0-5.51,0H45A7.51,7.51,0,0,0,37.46,62V93.49A7.51,7.51,0,0,0,45,101H105a7.51,7.51,0,0,0,7.51-7.51V62A7.51,7.51,0,0,0,105,54.49Z" />
+    <path
+        android:fillColor="#C5CAE9"
+        android:strokeColor="#C5CAE9"
+        android:strokeWidth="1.14"
+        android:strokeLineJoin="round"
+        android:pathData="M75,96.14a18.4,18.4,0,1,1,18.39-18.4A18.42,18.42,0,0,1,75,96.14Zm0-33.79A15.39,15.39,0,1,0,90.39,77.74,15.41,15.41,0,0,0,75,62.35Z" />
+    <path
+        android:fillColor="#C5CAE9"
+        android:strokeColor="#C5CAE9"
+        android:strokeWidth="1.14"
+        android:strokeLineJoin="round"
+        android:pathData="M59.91,60.85A1.81,1.81,0,1,1,58.1,59,1.81,1.81,0,0,1,59.91,60.85Z" />
+    <path
+        android:fillColor="#C5CAE9"
+        android:pathData="M 99.38 57.25 L 105.26 57.25 Q 108.09 57.25 108.09 60.08 L 108.09 61.62 Q 108.09 64.45 105.26 64.45 L 99.38 64.45 Q 96.55 64.45 96.55 61.62 L 96.55 60.08 Q 96.55 57.25 99.38 57.25 Z" />
+    <path
+        android:fillColor="#C5CAE9"
+        android:pathData="M 75 68.57 C 80.0644511559 68.57 84.17 72.6755488441 84.17 77.74 C 84.17 82.8044511559 80.0644511559 86.91 75 86.91 C 69.9355488441 86.91 65.83 82.8044511559 65.83 77.74 C 65.83 72.6755488441 69.9355488441 68.57 75 68.57 Z" />
+</vector>

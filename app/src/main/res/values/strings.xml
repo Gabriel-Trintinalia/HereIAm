@@ -1,4 +1,3 @@
-
 <resources>
     <string name="app_name">Here I Am</string>
     <string name="label_events">Events</string>
@@ -52,6 +51,8 @@
     <string name="invitation_cta">Invite People...</string>
     <string name="invitation_message">Hello! Somebody wants to share a map with you</string>
     <string name="invitation_deep_link">Invite People...</string>
+    <string name="NEW_MAP_TITLE">New Map</string>
+    <string name="type_map_subject_here">Type map subject here...</string>
 
 
 </resources>

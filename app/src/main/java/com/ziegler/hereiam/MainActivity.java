@@ -1,11 +1,9 @@
 package com.ziegler.hereiam;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,7 +11,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
@@ -63,31 +60,9 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                    /* Alert Dialog Code Start*/
-                AlertDialog.Builder alert = new AlertDialog.Builder(context);
-                alert.setTitle("Create Map"); //Set Alert dialog title here
+                Intent room = new Intent(MainActivity.this, NewMapActivity.class);
+                startActivity(room);
 
-                // Set an EditText view to get user input
-                final EditText input = new EditText(context);
-                input.setHint("Map Name");
-                alert.setView(input);
-
-                alert.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-
-                        String srt = input.getEditableText().toString();
-                        FirebaseUtil.createRoom(srt);
-                    } // End of onClick(DialogInterface dialog, int whichButton)
-                }); //End of alert.setPositiveButton
-
-                alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Canceled.
-                        dialog.cancel();
-                    }
-                }); //End of alert.setNegativeButton
-                AlertDialog alertDialog = alert.create();
-                alertDialog.show();
 
             }
         });

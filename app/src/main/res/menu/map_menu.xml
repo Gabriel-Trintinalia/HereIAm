@@ -8,7 +8,6 @@
         android:title="Share"
         app:showAsAction="ifRoom" />
 
-
     <!-- Settings, should always be in the overflow -->
     <item
         android:id="@+id/action_detail"
@@ -19,6 +18,4 @@
         android:id="@+id/action_settings"
         android:title="Exit"
         app:showAsAction="never" />
-
-
 </menu>
