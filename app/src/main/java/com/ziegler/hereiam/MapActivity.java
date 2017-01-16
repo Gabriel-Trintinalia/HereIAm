@@ -53,10 +53,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent room = new Intent(MapActivity.this, RoomDetailActivity.class);
-                room.putExtra(getString(R.string.EVENT_KEY), roomKey);
-
-                startActivity(room);
+                startDetailActivity();
             }
         });
 
@@ -162,6 +159,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             finish(); // close this activity and return to preview activity (if there is any)
         }
 
+        if (item.getItemId() == R.id.action_detail) {
+            startDetailActivity();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -236,5 +237,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
 
+    }
+
+
+    private void startDetailActivity() {
+        Intent room = new Intent(MapActivity.this, RoomDetailActivity.class);
+        room.putExtra(getString(R.string.EVENT_KEY), roomKey);
+
+        startActivity(room);
     }
 }
