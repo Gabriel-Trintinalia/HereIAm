@@ -53,6 +53,11 @@
     <string name="invitation_deep_link">Invite People...</string>
     <string name="NEW_MAP_TITLE">New Map</string>
     <string name="type_map_subject_here">Type map subject here...</string>
+    <string name="no_maps_yet">No Maps Yet</string>
+    <string name="add_map_info">Provide a map subject and optional icon</string>
+    <string name="detail_participants">Participants</string>
+    <string name="add_participant_hint">Add participant...</string>
+    <string name="exit_map">Exit map</string>
 
 
 </resources>

@@ -1,4 +1,3 @@
-
 package com.ziegler.hereiam;
 
 import android.content.Intent;
@@ -44,9 +43,9 @@ import java.util.Map;
 public class WelcomeActivity extends BaseActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener {
 
-    private static final String TAG = "WelcomeActivity";
+    private static final String TAG = "WELCOMEACTIVITY";
     private static final int RC_SIGN_IN = 103;
-    private final String VIDEO_KEY = "VIDEO_KEY";
+
     private FirebaseAuth mAuth;
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth.AuthStateListener mAuthListener;
@@ -307,9 +306,7 @@ public class WelcomeActivity extends BaseActivity implements View.OnClickListene
                             Toast.makeText(WelcomeActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
-
                             handleFirebaseAuthResult(task.getResult());
-
                         }
 
                     }

@@ -14,14 +14,6 @@
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-        <!--android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:layout_scrollFlags="scroll|snap"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" /-->
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -44,8 +36,8 @@
             android:id="@+id/viewA"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#fff"
-            android:padding="16dp">
+            android:background="@color/info_background"
+            android:padding="@dimen/common_padding">
 
             <LinearLayout
 
@@ -56,8 +48,8 @@
 
                 <ImageView
                     android:id="@+id/map_icon"
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
+                    android:layout_width="@dimen/add_icon_size"
+                    android:layout_height="@dimen/add_icon_size"
                     android:src="@drawable/ic_add_icon" />
 
                 <EditText
@@ -72,12 +64,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/input_new_map"
-                android:layout_marginBottom="8dp"
-
-                android:layout_marginTop="8dp"
-                android:text="Provide a map subject and optional icon"
+                android:layout_marginBottom="@dimen/small_spacing"
+                android:layout_marginTop="@dimen/small_spacing"
+                android:text="@string/add_map_info"
                 android:textColor="@color/secondary_text"
-                android:textSize="12sp" />
+                android:textSize="@dimen/mini_text_size" />
 
 
         </RelativeLayout>

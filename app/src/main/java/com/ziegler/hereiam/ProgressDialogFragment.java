@@ -1,6 +1,4 @@
-
 package com.ziegler.hereiam;
-
 
 import android.app.Dialog;
 import android.app.ProgressDialog;

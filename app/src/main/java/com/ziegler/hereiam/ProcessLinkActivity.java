@@ -1,4 +1,3 @@
-
 package com.ziegler.hereiam;
 
 import android.content.Intent;
@@ -17,7 +16,6 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
 
 public class ProcessLinkActivity extends BaseActivity implements GoogleApiClient.OnConnectionFailedListener {
 
@@ -56,7 +54,6 @@ public class ProcessLinkActivity extends BaseActivity implements GoogleApiClient
                                             Intent welcome = new Intent(ProcessLinkActivity.this, WelcomeActivity.class);
                                             startActivity(welcome);
                                         } else {
-                                            Log.d(TAG, "Join room ");
 
                                             FirebaseUtil.joinRoom(user.getUid(), roomKey);
                                         }
@@ -66,6 +63,7 @@ public class ProcessLinkActivity extends BaseActivity implements GoogleApiClient
                                     finish();
 
                                 } else {
+                                    // TODO: 16/01/2017 Create user friendly message when the link is wrong
                                     Log.d(TAG, "getInvitation: no deep link found.");
                                 }
                             }

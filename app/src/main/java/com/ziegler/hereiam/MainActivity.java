@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        Query allPostsQuery = FirebaseUtil.getBaseRef().child("people").child(userID).child("rooms");
+        Query allPostsQuery = FirebaseUtil.getCurrentUserRef().child("rooms");
         mAdapter = getFirebaseRecyclerAdapter(allPostsQuery);
 
         mRecyclerView.setAdapter(mAdapter);

@@ -107,7 +107,7 @@ public class RoomDetailActivity extends AppCompatActivity {
         mRecyclerView = (RecyclerView) findViewById(R.id.room_detail_recycler_view);
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        Query allPostsQuery = FirebaseUtil.getBaseRef().child("rooms").child(roomKey).child("people");
+        Query allPostsQuery = FirebaseUtil.getRoomsRef().child(roomKey).child("people");
         mAdapter = getFirebaseRecyclerAdapter(allPostsQuery);
         mRecyclerView.setAdapter(mAdapter);
     }

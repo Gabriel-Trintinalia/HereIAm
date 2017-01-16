@@ -16,9 +16,9 @@ import java.util.Map;
 
 public class FirebaseUtil {
 
-    final String TAG = "FirebaseUtil";
+    final String TAG = "FIREBASEUTIL";
 
-    public static DatabaseReference getBaseRef() {
+    private static DatabaseReference getBaseRef() {
         return FirebaseDatabase.getInstance().getReference();
     }
 
@@ -39,16 +39,16 @@ public class FirebaseUtil {
         return null;
     }
 
-    public static DatabaseReference getUserDocumentsRef() {
-        return getBaseRef().child("documents_users");
-    }
-
     public static String getUserDocumentsPath() {
         return "documents_users/";
     }
 
-    public static DatabaseReference getListOfDocumentsRef() {
-        return getBaseRef().child("documents");
+    public static DatabaseReference getRoomsRef() {
+        return getBaseRef().child("rooms");
+    }
+
+    public static DatabaseReference getLocationsRef() {
+        return getBaseRef().child("locations");
     }
 
     public static DatabaseReference getPeopleRef() {

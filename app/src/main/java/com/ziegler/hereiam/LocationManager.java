@@ -1,8 +1,6 @@
 package com.ziegler.hereiam;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
@@ -27,7 +25,6 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
     // Google client to interact with Google API
     private static GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
-    LocationSettingReceiver locationSettingReceiver;
     // Location updates intervals in sec
     private static int UPDATE_INTERVAL = 20000; // 10 sec
     private static int FATEST_INTERVAL = 10000; // 5 sec
@@ -42,10 +39,8 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
     @Override
     public void onCreate() {
         super.onCreate();
-        locationSettingReceiver = new LocationSettingReceiver();
         IntentFilter filter = new IntentFilter();
         filter.addAction("com.ziegler.utracker.CHANGE_SETTINGS");
-        registerReceiver(locationSettingReceiver, filter);
         createLocationRequest();
         buildGoogleApiClient();
     }
@@ -67,7 +62,6 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
-        unregisterReceiver(locationSettingReceiver);
     }
 
     @Nullable
@@ -143,18 +137,5 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
             Log.d(TAG, e.getMessage());
         }
         return null;
-    }
-
-    class LocationSettingReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if (intent.hasExtra("KEY_ONLINE")) {
-                mRequestingLocationUpdates = intent.getBooleanExtra("KEY_ONLINE", false);
-                if (mRequestingLocationUpdates)
-                    startLocationUpdates();
-                else
-                    stopLocationUpdates();
-            }
-        }
     }
 }

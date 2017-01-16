@@ -47,8 +47,29 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onCreate(savedInstanceState);
         setContentView(R.layout.room_map);
 
+        setActionBar();
+
+        Intent intent = getIntent();
+        roomKey = intent.getStringExtra(getString(R.string.EVENT_KEY));
+        roomName = intent.getStringExtra(getString(R.string.NAME_ROOM));
+        toolbar.setTitle(roomName);
+
+        // Starting Google Maps
+        SupportMapFragment mapFragment =
+                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+        mapFragment.getMapAsync(MapActivity.this);
+
+    }
+
+    private void setActionBar() {
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        ActionBar ab = getSupportActionBar();
+        if (ab != null) {
+            ab.setDisplayHomeAsUpEnabled(true);
+        }
 
         toolbar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -56,20 +77,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 startDetailActivity();
             }
         });
-
-        Intent intent = getIntent();
-        roomKey = intent.getStringExtra(getString(R.string.EVENT_KEY));
-        roomName = intent.getStringExtra(getString(R.string.NAME_ROOM));
-
-        SupportMapFragment mapFragment =
-                (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-
-        ActionBar ab = getSupportActionBar();
-        ab.setDisplayHomeAsUpEnabled(true);
-
-        mapFragment.getMapAsync(MapActivity.this);
-        toolbar.setTitle(roomName);
-
     }
 
     @Override
@@ -77,25 +84,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap = map;
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_FINE_LOCATION);
-
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-
         }
+
         mMap.setMyLocationEnabled(true);
         //LatLng loc = new LatLng(-37.837329, 144.986561);
         setCenterMap(mMap);
 
-        FirebaseUtil.getBaseRef().child("rooms").child(roomKey).addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseUtil.getRoomsRef().child(roomKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 toolbar.setTitle(roomName);
@@ -107,14 +105,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-
-
     }
 
+    //
+    // Add content in the map
+    //
     private void addPeople(Room room, String roomKey) {
 
         for (final String key : room.getPeople().keySet()) {
-            FirebaseUtil.getBaseRef().child("locations").child(key).addValueEventListener(new ValueEventListener() {
+            FirebaseUtil.getLocationsRef().child(key).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 
@@ -156,13 +155,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public boolean onOptionsItemSelected(MenuItem item) {
         // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity (if there is any)
+            finish(); // close this activity and return to preview activity
         }
 
         if (item.getItemId() == R.id.action_detail) {
-            startDetailActivity();
+            startDetailActivity();  // start activity to show details of the map
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -175,7 +173,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
                 }
                 return;
             }
@@ -213,15 +210,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
+
+    //
+    // Show map details
+    //
+    private void startDetailActivity() {
+        Intent room = new Intent(MapActivity.this, RoomDetailActivity.class);
+        room.putExtra(getString(R.string.EVENT_KEY), roomKey);
+
+        startActivity(room);
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
+        // Check if the user still belongs to the map.
         checkRoomAvailable();
     }
 
+
+    //
+    // Validation to check if the user belongs to the map.
+    //
     private void checkRoomAvailable() {
 
-        FirebaseUtil.getBaseRef().child("people").child(FirebaseUtil.getCurrentUserId()).addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseUtil.getCurrentUserRef().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Person person = dataSnapshot.getValue(Person.class);
@@ -237,13 +250,5 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         });
 
 
-    }
-
-
-    private void startDetailActivity() {
-        Intent room = new Intent(MapActivity.this, RoomDetailActivity.class);
-        room.putExtra(getString(R.string.EVENT_KEY), roomKey);
-
-        startActivity(room);
     }
 }
