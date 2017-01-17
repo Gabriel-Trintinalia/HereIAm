@@ -61,6 +61,8 @@
     <string name="picture_chooser_title">Choose an icon...</string>
     <string name="error_required_field">Type a map subject here...</string>
     <string name="create_map_message">Creating map...</string>
+    <string name="sharing_location_info">You are sharing your location.</string>
+    <string name="notification_title">Here I am</string>
 
 
 </resources>

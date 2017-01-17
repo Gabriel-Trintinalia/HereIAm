@@ -195,18 +195,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+
         android.location.Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
         if (location != null) {
             map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                    .zoom(17)                   // Sets the zoom
+                    .zoom(16)                   // Sets the zoom
                     .bearing(90)                // Sets the orientation of the camera to east
                     .build();                   // Creates a CameraPosition from the builder
 
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
         }
     }
 
@@ -250,4 +250,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     }
+
+
 }

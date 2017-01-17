@@ -1,5 +1,6 @@
 package com.ziegler.hereiam;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -27,6 +28,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private FloatingActionButton mFab;
     final Context context = this;
+
+    private Menu menu;
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter<RoomItemListViewHolder> mAdapter;
@@ -67,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        startService(new Intent(this, LocationManager.class));
     }
 
 
@@ -102,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 room.putExtra(getString(R.string.NAME_ROOM), roomItemList.getName());
 
                 // shareRoom(roomKey);
+                startSharingLocationService();
                 startActivity(room);
             }
         });
@@ -139,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
+        this.menu = menu;
+
         return true;
     }
 
@@ -153,9 +158,39 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
+        if (item.getItemId() == R.id.action_share_main) {
+            Intent intent = new Intent(this, LocationManager.class);
+
+
+            if (isMyServiceRunning(LocationManager.class)) {
+                stopService(intent);
+                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map));
+
+
+            } else {
+                startService(intent);
+                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map_sharing));
+
+            }
+
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void startSharingLocationService() {
+
+
+    }
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
