@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void populateViewHolder(final RoomItemListViewHolder itemViewHolder,
                                            final RoomItemList room, final int position) {
-                setupRoomItemList(itemViewHolder, room, position, null);
+                setupRoomItemList(itemViewHolder, room, position, getRef(position).getKey());
             }
 
             @Override
@@ -92,12 +92,12 @@ public class MainActivity extends AppCompatActivity {
     private void setupRoomItemList(final RoomItemListViewHolder roomItemListViewHolder, final RoomItemList roomItemList, final int position, final String roomKey) {
         roomItemListViewHolder.setName(roomItemList.getName());
 
+        roomItemListViewHolder.setPicture(roomItemList.getPicture());
         roomItemListViewHolder.setOnClickListener(new RoomItemListViewHolder.RoomItemClickListener() {
             @Override
             public void openRoom() {
                 Intent room = new Intent(MainActivity.this, MapActivity.class);
 
-                String roomKey = ((FirebaseRecyclerAdapter) mAdapter).getRef(position).getKey();
                 room.putExtra(getString(R.string.EVENT_KEY), roomKey);
                 room.putExtra(getString(R.string.NAME_ROOM), roomItemList.getName());
 

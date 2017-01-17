@@ -18,7 +18,7 @@ public class FirebaseUtil {
 
     final String TAG = "FIREBASEUTIL";
 
-    private static DatabaseReference getBaseRef() {
+    public static DatabaseReference getBaseRef() {
         return FirebaseDatabase.getInstance().getReference();
     }
 
@@ -65,20 +65,25 @@ public class FirebaseUtil {
         return user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null;
     }
 
-    public static void createRoom(String roomName) {
+    public static void createRoom(String roomName, String picture) {
 
         String owner = FirebaseUtil.getCurrentUserId();
-        String picture = FirebaseUtil.getCurrentPhotoUrl();
         String name = FirebaseUtil.getCurrentDisplayName();
+        String ownerPicture = FirebaseUtil.getCurrentPhotoUrl();
+
 
         String roomKey = FirebaseUtil.getBaseRef().child("rooms").push().getKey();
         Map<String, Object> updateValues = new HashMap<>();
         updateValues.put("people/" + owner + "/rooms/" + roomKey + "/name", roomName);
+        updateValues.put("people/" + owner + "/rooms/" + roomKey + "/picture", picture);
+
         updateValues.put("rooms/" + roomKey + "/name", roomName);
         updateValues.put("rooms/" + roomKey + "/owner", owner);
+        updateValues.put("rooms/" + roomKey + "/picture", picture);
+
 
         updateValues.put("rooms/" + roomKey + "/people/ " + owner + "/name", name);
-        updateValues.put("rooms/" + roomKey + "/people/ " + owner + "/picture", picture);
+        updateValues.put("rooms/" + roomKey + "/people/ " + owner + "/picture", ownerPicture);
 
 
         FirebaseUtil.getBaseRef().updateChildren(updateValues,
@@ -103,6 +108,7 @@ public class FirebaseUtil {
 
                 Map<String, Object> updateValues = new HashMap<>();
                 updateValues.put("people/" + user + "/rooms/" + roomKey + "/name", room.getName());
+
                 updateValues.put("rooms/" + roomKey + "/people/ " + user + "/name", FirebaseUtil.getCurrentDisplayName());
                 updateValues.put("rooms/" + roomKey + "/people/ " + user + "/picture", FirebaseUtil.getCurrentPhotoUrl());
 

@@ -8,6 +8,8 @@ import java.util.Map;
 
 public class Room {
     private String name;
+    private String picture;
+
     private String owner;
     private Map<String, Object> people;
 
@@ -24,5 +26,9 @@ public class Room {
 
     public Map<String, Object> getPeople() {
         return people;
+    }
+
+    public String getPicture() {
+        return picture;
     }
 }

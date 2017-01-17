@@ -238,8 +238,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Person person = dataSnapshot.getValue(Person.class);
-
-                if (!person.getRooms().containsKey(roomKey))
+                if ((person == null || (person.getRooms()) == null) || (!person.getRooms().containsKey(roomKey)))
                     finish();
             }
 

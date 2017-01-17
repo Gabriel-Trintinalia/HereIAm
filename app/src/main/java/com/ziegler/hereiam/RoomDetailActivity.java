@@ -13,11 +13,17 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
+import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.ziegler.hereiam.Models.Room;
 import com.ziegler.hereiam.Models.RoomItemList;
 
 
@@ -62,6 +68,28 @@ public class RoomDetailActivity extends AppCompatActivity {
                 startActivityForResult(intent, REQUEST_INVITE);
             }
         });
+
+        FirebaseUtil.getRoomsRef().child(roomKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Room room = dataSnapshot.getValue(Room.class);
+                ImageView backdrop = (ImageView) findViewById(R.id.backdrop);
+                Glide.with(RoomDetailActivity.this)
+                        .load(room.getPicture())
+                        .placeholder(R.drawable.ic_map)
+                        .dontAnimate()
+                        .fitCenter()
+                        .into(backdrop);
+
+                toolbar.setTitle(room.getName());
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         buttonExitMap.setOnClickListener(new View.OnClickListener() {
             @Override
