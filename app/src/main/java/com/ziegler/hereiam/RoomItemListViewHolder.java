@@ -18,6 +18,9 @@ public class RoomItemListViewHolder extends RecyclerView.ViewHolder {
 
     private RoomItemClickListener mListener;
     private TextView mRoomNameTextView;
+    private TextView mTextSubText;
+
+
     private CircleImageView mImageProfile;
 
     private RelativeLayout button;
@@ -27,7 +30,7 @@ public class RoomItemListViewHolder extends RecyclerView.ViewHolder {
 
         mRoomNameTextView = (TextView) itemView.findViewById(R.id.main_text);
         mImageProfile = (CircleImageView) itemView.findViewById(R.id.profile_icon);
-
+        mTextSubText = (TextView) itemView.findViewById(R.id.ic_sub_text);
     }
 
     public void setName(String name) {
@@ -36,6 +39,7 @@ public class RoomItemListViewHolder extends RecyclerView.ViewHolder {
 
     public void setPicture(String url) {
 
+
         Context context = mImageProfile.getContext();
         Glide.with(context)
                 .load(url)
@@ -43,6 +47,10 @@ public class RoomItemListViewHolder extends RecyclerView.ViewHolder {
                 .dontAnimate()
                 .fitCenter()
                 .into(mImageProfile);
+    }
+
+    public void setSubText(String s) {
+        mTextSubText.setText(s);
     }
 
 

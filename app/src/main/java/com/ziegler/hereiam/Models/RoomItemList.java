@@ -7,6 +7,8 @@ package com.ziegler.hereiam.Models;
 public class RoomItemList {
     private String name;
     private String picture;
+    private boolean sharing;
+
 
 
     public RoomItemList() {
@@ -19,5 +21,9 @@ public class RoomItemList {
 
     public String getPicture() {
         return picture;
+    }
+
+    public boolean isSharing() {
+        return sharing;
     }
 }

@@ -164,6 +164,12 @@ public class RoomDetailActivity extends AppCompatActivity {
         roomItemListViewHolder.setName(roomItemList.getName());
         roomItemListViewHolder.setPicture(roomItemList.getPicture());
 
+        if (roomItemList.isSharing())
+            roomItemListViewHolder.setSubText("Active");
+        else
+            roomItemListViewHolder.setSubText("Invisible");
+
+
     }
 
     @Override
