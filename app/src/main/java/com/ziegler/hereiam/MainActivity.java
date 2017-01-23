@@ -154,22 +154,6 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-        if (item.getItemId() == R.id.action_share_main) {
-            Intent intent = new Intent(this, LocationManager.class);
-
-
-            if (isMyServiceRunning(LocationManager.class)) {
-                stopService(intent);
-                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map));
-
-
-            } else {
-                startService(intent);
-                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map_sharing));
-
-            }
-
-        }
 
         return super.onOptionsItemSelected(item);
     }

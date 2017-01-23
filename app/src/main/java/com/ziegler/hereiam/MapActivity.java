@@ -1,5 +1,6 @@
 package com.ziegler.hereiam;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -258,10 +259,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         if (item.getItemId() == R.id.action_share_location_map) {
+            Intent intent = new Intent(this, com.ziegler.hereiam.LocationManager.class);
+
+            // if (isMyServiceRunning(com.ziegler.hereiam.LocationManager.class)) {
+            if (isMyServiceRunning(com.ziegler.hereiam.LocationManager.class)) {
+                stopService(intent);
+                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map));
+
+            } else {
+                startService(intent);
+                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map_sharing));
+            }
 
             FirebaseUtil.setSharingRoom(FirebaseUtil.getCurrentUserId(), roomKey, true);
             // start activity to show details of the map
         }
+
 
         if (item.getItemId() == R.id.action_invite) {
 
@@ -404,5 +417,16 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             marker.get(key).remove();
             marker.remove(key);
         }
+    }
+
+
+    private boolean isMyServiceRunning(Class<?> serviceClass) {
+        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
     }
 }
