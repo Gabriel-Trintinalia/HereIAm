@@ -9,6 +9,8 @@ import java.util.Map;
 public class Room {
     private String name;
     private String picture;
+    private boolean sharing;
+
 
     private String owner;
     private Map<String, Object> people;
@@ -30,5 +32,9 @@ public class Room {
 
     public String getPicture() {
         return picture;
+    }
+
+    public boolean isSharing() {
+        return sharing;
     }
 }

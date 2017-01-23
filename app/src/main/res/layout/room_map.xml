@@ -29,6 +29,11 @@
         android:layout_height="match_parent"
         android:layout_below="@id/layout_toolbar" />
 
+    <ImageView
+        android:id="@+id/image_icon_fake"
+        android:layout_width="24dp"
+        android:layout_height="24dp" />
+
 </RelativeLayout>
 
 

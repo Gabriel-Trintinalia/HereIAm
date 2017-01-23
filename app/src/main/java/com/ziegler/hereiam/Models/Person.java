@@ -10,7 +10,7 @@ public class Person {
     private String picture;
     private String name;
 
-    private Map<String, Object> rooms;
+    private Map<String, Room> rooms;
     private Map<String, Object> myRooms;
 
     public Person() {
@@ -24,7 +24,7 @@ public class Person {
         return name;
     }
 
-    public Map<String, Object> getRooms() {
+    public Map<String, Room> getRooms() {
         return rooms;
     }
 

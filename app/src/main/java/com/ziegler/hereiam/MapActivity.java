@@ -3,6 +3,8 @@ package com.ziegler.hereiam;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -14,16 +16,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.ziegler.hereiam.Models.Location;
 import com.ziegler.hereiam.Models.Person;
@@ -32,15 +41,20 @@ import com.ziegler.hereiam.Models.Room;
 import java.util.HashMap;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "MAPACTIVITY";
     private static final int MY_PERMISSIONS_FINE_LOCATION = 848;
     private String roomKey;
     private String roomName;
 
     private GoogleMap mMap;
+
     private Toolbar toolbar;
 
+    private Menu menu;
+
+
     private HashMap<String, Marker> marker = new HashMap<>();
+    private HashMap<DatabaseReference, ValueEventListener> eventListenersList = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +77,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
     private void setActionBar() {
-
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar ab = getSupportActionBar();
@@ -90,6 +103,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         mMap.setMyLocationEnabled(true);
+
         //LatLng loc = new LatLng(-37.837329, 144.986561);
         setCenterMap(mMap);
 
@@ -105,78 +119,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-    }
-
-    //
-    // Add content in the map
-    //
-    private void addPeople(Room room, String roomKey) {
-
-        for (final String key : room.getPeople().keySet()) {
-            FirebaseUtil.getLocationsRef().child(key).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-
-                    Location location = dataSnapshot.getValue(Location.class);
-
-                    if (location == null) return;
-
-                    if (marker.containsKey(key)) {
-                        marker.get(key).setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
-
-                    } else {
-                        LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-
-                        Marker m = mMap.addMarker(new MarkerOptions()
-                                .title(location.getName())
-                                .position(loc));
-                        marker.put(dataSnapshot.getKey(), m);
-
-                    }
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-                }
-            });
-        }
-    }
-
-    // Menu icons are inflated just as they were with actionbar
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.map_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
-        if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to preview activity
-        }
-
-        if (item.getItemId() == R.id.action_detail) {
-            startDetailActivity();  // start activity to show details of the map
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case MY_PERMISSIONS_FINE_LOCATION: {
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0
-                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                }
-                return;
-            }
-        }
     }
 
 
@@ -202,14 +144,127 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
-                    .zoom(16)                   // Sets the zoom
-                    .bearing(90)                // Sets the orientation of the camera to east
+                    .zoom(14)                   // Sets the zoom
                     .build();                   // Creates a CameraPosition from the builder
 
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         }
     }
 
+    private void calculateBoundary(GoogleMap map) {
+
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (String k : marker.keySet()) {
+            builder.include(marker.get(k).getPosition());
+        }
+
+        builder.include(map.getCameraPosition().target);
+        // Creates a CameraPosition from the builder
+
+
+        LatLngBounds bounds = builder.build();
+        int padding = 100; // offset from edges of the map in pixels
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+
+    }
+
+    //
+    // Add content in the map
+    //
+    private void addPeople(Room room, String roomKey) {
+
+        for (final String key : room.getPeople().keySet()) {
+            if (key.trim().equals(FirebaseUtil.getCurrentUserId())) continue;
+            ValueEventListener listener = getNewEventListener(key);
+
+            DatabaseReference ref = FirebaseUtil.getLocationsRef().child(key.trim());
+            ref.addValueEventListener(listener);
+            eventListenersList.put(ref, listener);
+        }
+    }
+
+    // Menu icons are inflated just as they were with actionbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.map_menu, menu);
+        this.menu = menu;
+        return true;
+    }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle arrow click here
+        if (item.getItemId() == android.R.id.home) {
+            finish(); // close this activity and return to preview activity
+        }
+
+        if (item.getItemId() == R.id.action_detail) {
+            startDetailActivity();  // start activity to show details of the map
+        }
+
+        if (item.getItemId() == R.id.action_share_location_map) {
+
+            FirebaseUtil.setSharingRoom(FirebaseUtil.getCurrentUserId(), roomKey, true);
+            // start activity to show details of the map
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_FINE_LOCATION: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                }
+                return;
+            }
+        }
+    }
+
+
+    private ValueEventListener getNewEventListener(final String key) {
+        return new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Location location = dataSnapshot.getValue(Location.class);
+                if (location == null) return;
+
+                if (marker.containsKey(key)) {
+                    marker.get(key).setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+                } else {
+                    LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+
+                    BitmapDescriptor markerIcon;
+                    Drawable circleDrawable = getResources().getDrawable(R.drawable.ic_person_in_map);
+                    markerIcon = Util.getMarkerIconFromDrawable(circleDrawable);
+
+                    Marker m = mMap.addMarker(new MarkerOptions()
+                            .title(location.getName())
+                            .icon(markerIcon)
+                            .anchor(0.5f, 0.5f)
+                            .position(loc));
+
+                    marker.put(key, m);
+                    setIconPicture(location.getPicture(), m);
+                    //  calculateBoundary(mMap);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+    }
 
     //
     // Show map details
@@ -234,12 +289,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     //
     private void checkRoomAvailable() {
 
-        FirebaseUtil.getCurrentUserRef().addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseUtil.getCurrentUserRef().addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Person person = dataSnapshot.getValue(Person.class);
                 if ((person == null || (person.getRooms()) == null) || (!person.getRooms().containsKey(roomKey)))
                     finish();
+
+/*                if (person.getRooms().get(roomKey).isSharing()) {
+                    menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map_sharing));
+                } else {
+                    menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map));
+                }*/
             }
 
             @Override
@@ -251,5 +312,34 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
+    public void setIconPicture(String src, final Marker marker) {
 
+        Glide.with(this)
+                .load(src)
+                .asBitmap()
+                .listener(new RequestListener<String, Bitmap>() {
+                    @Override
+                    public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                        marker.setIcon(BitmapDescriptorFactory.fromBitmap(Util.getCroppedBitmap(resource)));
+                        return false;
+                    }
+                })
+                .into(50, 50);
+    }
+
+
+    @Override
+    public void onPause() {
+        for (DatabaseReference ref : eventListenersList.keySet()) {
+            ref.removeEventListener(eventListenersList.get(ref));
+        }
+
+        super.onPause();
+
+    }
 }

@@ -39,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         final String userID = FirebaseUtil.getCurrentUserId();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -65,13 +66,10 @@ public class MainActivity extends AppCompatActivity {
 
                 Intent room = new Intent(MainActivity.this, NewMapActivity.class);
                 startActivity(room);
-
-
             }
         });
 
     }
-
 
     private FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder> getFirebaseRecyclerAdapter(Query query) {
         return new FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder>(
@@ -89,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
-
 
     private void setupRoomItemList(final RoomItemListViewHolder roomItemListViewHolder, final RoomItemList roomItemList, final int position, final String roomKey) {
         roomItemListViewHolder.setName(roomItemList.getName());
@@ -135,7 +132,6 @@ public class MainActivity extends AppCompatActivity {
         sendIntent.putExtra(Intent.EXTRA_TEXT, urla.toString());
         sendIntent.setType("text/plain");
         startActivity(Intent.createChooser(sendIntent, "Share with..."));
-
     }
 
     @Override

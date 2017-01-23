@@ -35,6 +35,7 @@ import com.google.firebase.crash.FirebaseCrash;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
@@ -52,11 +53,17 @@ public class WelcomeActivity extends BaseActivity implements View.OnClickListene
     private CallbackManager mCallbackManager;
     private LoginButton loginButton;
 
+    private static boolean init = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
 
+        if (!init) {
+            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+            init = true;
+        }
         setContentView(R.layout.activity_welcome);
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);

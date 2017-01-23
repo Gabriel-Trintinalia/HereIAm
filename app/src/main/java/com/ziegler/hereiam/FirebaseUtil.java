@@ -151,6 +151,25 @@ public class FirebaseUtil {
     }
 
 
+    public static void setSharingRoom(final String user, final String roomKey, boolean share) {
+
+
+        Map<String, Object> updateValues = new HashMap<>();
+        updateValues.put("people/" + user + "/rooms/" + roomKey + "/sharing", share);
+        updateValues.put("rooms/" + roomKey + "/people/ " + user + "/sharing", share);
+
+        FirebaseUtil.getBaseRef().updateChildren(updateValues,
+                new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError firebaseError, final DatabaseReference databaseReference) {
+                        if (firebaseError != null) {
+                        } else {
+                        }
+                    }
+                });
+    }
+
+
     public static void postLocation(android.location.Location location) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {

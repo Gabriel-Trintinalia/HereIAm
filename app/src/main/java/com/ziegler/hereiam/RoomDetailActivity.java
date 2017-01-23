@@ -65,6 +65,8 @@ public class RoomDetailActivity extends AppCompatActivity {
                         //  .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
                         .setCallToActionText("Join")
                         .build();
+
+
                 startActivityForResult(intent, REQUEST_INVITE);
             }
         });
@@ -161,6 +163,7 @@ public class RoomDetailActivity extends AppCompatActivity {
     private void setupRoomItemList(final RoomItemListViewHolder roomItemListViewHolder, final RoomItemList roomItemList, final int position, final String roomKey) {
         roomItemListViewHolder.setName(roomItemList.getName());
         roomItemListViewHolder.setPicture(roomItemList.getPicture());
+
     }
 
     @Override
@@ -169,7 +172,6 @@ public class RoomDetailActivity extends AppCompatActivity {
         if (item.getItemId() == android.R.id.home) {
             finish(); // close this activity and return to preview activity (if there is any)
         }
-
         return super.onOptionsItemSelected(item);
     }
 
