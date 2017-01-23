@@ -111,11 +111,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         //LatLng loc = new LatLng(-37.837329, 144.986561);
         setCenterMap(mMap);
 
-        FirebaseUtil.getRoomsRef().child(roomKey).addListenerForSingleValueEvent(new ValueEventListener() {
+        FirebaseUtil.getRoomsRef().child(roomKey).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 toolbar.setTitle(roomName);
                 Room room = dataSnapshot.getValue(Room.class);
+
+                removeListeners();
                 addPeople(room, roomKey);
             }
 
@@ -124,6 +126,69 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
     }
+
+
+    //
+    // Add content in the map
+    //
+    private void addPeople(Room room, String roomKey) {
+
+        for (final String key : room.getPeople().keySet()) {
+            if (key.trim().equals(FirebaseUtil.getCurrentUserId())) continue;
+
+            ValueEventListener listener = getNewEventListener(key);
+
+            if (room.getPeople().get(key).isSharing()) {
+                DatabaseReference ref = FirebaseUtil.getLocationsRef().child(key.trim());
+                ref.addValueEventListener(listener);
+                eventListenersList.put(ref, listener);
+            } else {
+                removeMarkerPerson(key);
+            }
+        }
+    }
+
+    private ValueEventListener getNewEventListener(final String key) {
+        return new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                Location location = dataSnapshot.getValue(Location.class);
+                if (location == null) {
+                    removeMarkerPerson(key);
+                    return;
+                }
+
+
+                if (marker.containsKey(key)) {
+                    marker.get(key).setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+                } else {
+                    LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
+
+                    BitmapDescriptor markerIcon;
+                    Drawable circleDrawable = getResources().getDrawable(R.drawable.ic_person_in_map);
+                    markerIcon = Util.getMarkerIconFromDrawable(circleDrawable);
+
+                    Marker m = mMap.addMarker(new MarkerOptions()
+                            .title(location.getName())
+                            .icon(markerIcon)
+                            .anchor(0.5f, 0.5f)
+                            .position(loc));
+
+                    marker.put(key, m);
+                    setIconPicture(location.getPicture(), m);
+                    //  calculateBoundary(mMap);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+    }
+
+
     private void setCenterMap(GoogleMap map) {
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -170,20 +235,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    //
-    // Add content in the map
-    //
-    private void addPeople(Room room, String roomKey) {
-
-        for (final String key : room.getPeople().keySet()) {
-            if (key.trim().equals(FirebaseUtil.getCurrentUserId())) continue;
-            ValueEventListener listener = getNewEventListener(key);
-
-            DatabaseReference ref = FirebaseUtil.getLocationsRef().child(key.trim());
-            ref.addValueEventListener(listener);
-            eventListenersList.put(ref, listener);
-        }
-    }
 
     // Menu icons are inflated just as they were with actionbar
     @Override
@@ -266,46 +317,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-    private ValueEventListener getNewEventListener(final String key) {
-        return new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-
-                Location location = dataSnapshot.getValue(Location.class);
-                if (location == null) return;
-
-                if (marker.containsKey(key)) {
-                    marker.get(key).setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
-                } else {
-                    LatLng loc = new LatLng(location.getLatitude(), location.getLongitude());
-
-                    BitmapDescriptor markerIcon;
-                    Drawable circleDrawable = getResources().getDrawable(R.drawable.ic_person_in_map);
-                    markerIcon = Util.getMarkerIconFromDrawable(circleDrawable);
-
-                    Marker m = mMap.addMarker(new MarkerOptions()
-                            .title(location.getName())
-                            .icon(markerIcon)
-                            .anchor(0.5f, 0.5f)
-                            .position(loc));
-
-                    marker.put(key, m);
-                    setIconPicture(location.getPicture(), m);
-                    //  calculateBoundary(mMap);
-
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        };
-    }
-
     //
     // Show map details
     //
+
     private void startDetailActivity() {
         Intent room = new Intent(MapActivity.this, RoomDetailActivity.class);
         room.putExtra(getString(R.string.EVENT_KEY), roomKey);
@@ -372,11 +387,22 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onPause() {
+        removeListeners();
+        super.onPause();
+
+    }
+
+
+    private void removeListeners() {
         for (DatabaseReference ref : eventListenersList.keySet()) {
             ref.removeEventListener(eventListenersList.get(ref));
         }
+    }
 
-        super.onPause();
-
+    private void removeMarkerPerson(String key) {
+        if (marker.containsKey(key)) {
+            marker.get(key).remove();
+            marker.remove(key);
+        }
     }
 }

@@ -13,7 +13,7 @@ public class Room {
 
 
     private String owner;
-    private Map<String, Object> people;
+    private Map<String, MemberMap> people;
 
     public Room() {
     }
@@ -26,7 +26,7 @@ public class Room {
         return owner;
     }
 
-    public Map<String, Object> getPeople() {
+    public Map<String, MemberMap> getPeople() {
         return people;
     }
 
