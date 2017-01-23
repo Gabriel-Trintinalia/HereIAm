@@ -1,15 +1,18 @@
 package com.ziegler.hereiam;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -19,6 +22,7 @@ import android.view.View;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -120,8 +124,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             }
         });
     }
-
-
     private void setCenterMap(GoogleMap map) {
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -161,7 +163,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         builder.include(map.getCameraPosition().target);
         // Creates a CameraPosition from the builder
-
 
         LatLngBounds bounds = builder.build();
         int padding = 100; // offset from edges of the map in pixels
@@ -210,9 +211,45 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             FirebaseUtil.setSharingRoom(FirebaseUtil.getCurrentUserId(), roomKey, true);
             // start activity to show details of the map
         }
+
+        if (item.getItemId() == R.id.action_invite) {
+
+            Intent intent = new AppInviteInvitation.IntentBuilder(getString(R.string.invitation_title))
+                    .setMessage(getString(R.string.invitation_message))
+                    .setDeepLink(Uri.parse("https://hereiam-c7f82.firebaseio.com/rooms/?" + roomKey))
+                    //  .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
+                    .setCallToActionText("Join")
+                    .build();
+
+
+            startActivityForResult(intent, 1);
+            // start activity to show details of the map
+        }
+
+        if (item.getItemId() == R.id.action_exit_map) {
+
+            AlertDialog.Builder alert = new AlertDialog.Builder(this);
+            alert.setTitle("Exit Map"); //Set Alert dialog title here
+
+            alert.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    FirebaseUtil.exitRoom(FirebaseUtil.getCurrentUserId(), roomKey);
+                    finish();
+
+                }
+            });
+
+            alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int whichButton) {
+                    dialog.cancel();
+                }
+            });
+            AlertDialog alertDialog = alert.create();
+            alertDialog.show();
+
+        }
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode,

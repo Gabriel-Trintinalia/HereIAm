@@ -1,12 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <!-- "Mark Favorite", should appear as action button if possible -->
     <item
         android:id="@+id/action_share_location_map"
         android:icon="@drawable/ic_map"
         android:title="Share Location"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_invite"
+        android:icon="@drawable/ic_share_map"
+        android:title="Share Location"
+        app:showAsAction="ifRoom" />
+
 
     <!-- Settings, should always be in the overflow -->
     <item
@@ -15,7 +21,7 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/action_settings"
-        android:title="Exit"
+        android:id="@+id/action_exit_map"
+        android:title="Exit map"
         app:showAsAction="never" />
 </menu>
