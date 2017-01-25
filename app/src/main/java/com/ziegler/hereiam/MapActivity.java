@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.LocationManager;
@@ -20,21 +19,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -56,6 +52,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Toolbar toolbar;
 
     private Menu menu;
+    private Room room;
+    private Person person;
 
 
     private HashMap<String, Marker> marker = new HashMap<>();
@@ -78,7 +76,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(MapActivity.this);
-
+        addSharingLocationUser();
     }
 
     private void setActionBar() {
@@ -120,6 +118,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
                 removeListeners();
                 addPeople(room, roomKey);
+                addSharingLocationListenerForThisRoom();
+
             }
 
             @Override
@@ -177,7 +177,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                             .position(loc));
 
                     marker.put(key, m);
-                    setIconPicture(location.getPicture(), m);
+                    Util.setMarkerIcon(location.getPicture(), m, MapActivity.this);
                     //  calculateBoundary(mMap);
                 }
             }
@@ -259,20 +259,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         if (item.getItemId() == R.id.action_share_location_map) {
-            Intent intent = new Intent(this, com.ziegler.hereiam.LocationManager.class);
-
-            // if (isMyServiceRunning(com.ziegler.hereiam.LocationManager.class)) {
-            if (isMyServiceRunning(com.ziegler.hereiam.LocationManager.class)) {
-                stopService(intent);
+            if (room.isSharing()) {
+                FirebaseUtil.setSharingRoom(FirebaseUtil.getCurrentUserId(), roomKey, false);
                 menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map));
-
             } else {
-                startService(intent);
+                FirebaseUtil.setSharingRoom(FirebaseUtil.getCurrentUserId(), roomKey, true);
                 menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map_sharing));
             }
-
-            FirebaseUtil.setSharingRoom(FirebaseUtil.getCurrentUserId(), roomKey, true);
-            // start activity to show details of the map
         }
 
 
@@ -284,7 +277,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     //  .setCustomImage(Uri.parse(getString(R.string.invitation_custom_image)))
                     .setCallToActionText("Join")
                     .build();
-
 
             startActivityForResult(intent, 1);
             // start activity to show details of the map
@@ -333,11 +325,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     //
     // Show map details
     //
-
     private void startDetailActivity() {
         Intent room = new Intent(MapActivity.this, RoomDetailActivity.class);
         room.putExtra(getString(R.string.EVENT_KEY), roomKey);
-
         startActivity(room);
     }
 
@@ -360,12 +350,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 Person person = dataSnapshot.getValue(Person.class);
                 if ((person == null || (person.getRooms()) == null) || (!person.getRooms().containsKey(roomKey)))
                     finish();
-
-/*                if (person.getRooms().get(roomKey).isSharing()) {
-                    menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map_sharing));
-                } else {
-                    menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map));
-                }*/
             }
 
             @Override
@@ -377,26 +361,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     }
 
-    public void setIconPicture(String src, final Marker marker) {
-
-        Glide.with(this)
-                .load(src)
-                .asBitmap()
-                .listener(new RequestListener<String, Bitmap>() {
-                    @Override
-                    public boolean onException(Exception e, String model, Target<Bitmap> target, boolean isFirstResource) {
-                        return false;
-                    }
-
-                    @Override
-                    public boolean onResourceReady(Bitmap resource, String model, Target<Bitmap> target, boolean isFromMemoryCache, boolean isFirstResource) {
-                        marker.setIcon(BitmapDescriptorFactory.fromBitmap(Util.getCroppedBitmap(resource)));
-                        return false;
-                    }
-                })
-                .into(50, 50);
-    }
-
 
     @Override
     public void onPause() {
@@ -404,7 +368,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         super.onPause();
 
     }
-
 
     private void removeListeners() {
         for (DatabaseReference ref : eventListenersList.keySet()) {
@@ -429,4 +392,75 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
         return false;
     }
+
+    private void addSharingLocationListenerForThisRoom() {
+
+        ValueEventListener listener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                room = dataSnapshot.getValue(Room.class);
+                if (room.isSharing())
+                    menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map_sharing));
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        DatabaseReference database = FirebaseUtil.getCurrentUserRef().child("rooms").child(roomKey);
+        database.addValueEventListener(listener);
+        eventListenersList.put(database, listener);
+    }
+
+
+    private void addSharingLocationUser() {
+
+        ChildEventListener listener = new ChildEventListener() {
+
+
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                if (dataSnapshot.getKey() == "sharing")
+                    if (person.isSharing()) ;
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                if (dataSnapshot.getKey().equals("sharing")) {
+                    Intent intent = new Intent(MapActivity.this, com.ziegler.hereiam.LocationManager.class);
+                    if ((boolean) dataSnapshot.getValue()) {
+                        startService(intent);
+                    } else {
+                        stopService(intent);
+
+                    }
+                }
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        };
+
+        DatabaseReference database = FirebaseUtil.getCurrentUserRef();
+        database.addChildEventListener(listener);
+        //  eventListenersList.put(database, listener);
+    }
+
+
 }

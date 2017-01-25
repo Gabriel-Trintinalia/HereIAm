@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class FirebaseUtil {
 
-    final String TAG = "FIREBASEUTIL";
+    final static String TAG = "FIREBASEUTIL";
 
     public static DatabaseReference getBaseRef() {
         return FirebaseDatabase.getInstance().getReference();
@@ -151,22 +151,57 @@ public class FirebaseUtil {
     }
 
 
+
     public static void setSharingRoom(final String user, final String roomKey, boolean share) {
 
-
-        Map<String, Object> updateValues = new HashMap<>();
+        final Map<String, Object> updateValues = new HashMap<>();
         updateValues.put("people/" + user + "/rooms/" + roomKey + "/sharing", share);
         updateValues.put("rooms/" + roomKey + "/people/ " + user + "/sharing", share);
 
-        FirebaseUtil.getBaseRef().updateChildren(updateValues,
-                new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(DatabaseError firebaseError, final DatabaseReference databaseReference) {
-                        if (firebaseError != null) {
-                        } else {
+        if (share) {
+            updateValues.put("people/" + user + "/sharing", true);
+            FirebaseUtil.getBaseRef().updateChildren(updateValues,
+                    new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError firebaseError, final DatabaseReference databaseReference) {
+                            if (firebaseError != null) {
+                            } else {
+                            }
+                        }
+                    });
+        } else {
+
+            getCurrentUserRef().child("rooms").addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+
+                    boolean isSharing = false;
+                    for (DataSnapshot snap : dataSnapshot.getChildren()) {
+                        Room room = snap.getValue(Room.class);
+
+                        if (room.isSharing() && (!roomKey.equals(snap.getKey()))) {
+                            isSharing = true;
                         }
                     }
-                });
+
+                    updateValues.put("people/" + user + "/sharing", isSharing);
+                    FirebaseUtil.getBaseRef().updateChildren(updateValues,
+                            new DatabaseReference.CompletionListener() {
+                                @Override
+                                public void onComplete(DatabaseError firebaseError, final DatabaseReference databaseReference) {
+                                    if (firebaseError != null) {
+                                    } else {
+                                    }
+                                }
+                            });
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 
 

@@ -81,7 +81,6 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
         startForeground(101,
                 notification);
 
-        Toast.makeText(this, "Location Started", Toast.LENGTH_LONG).show();
         return START_STICKY;
     }
 

@@ -10,6 +10,9 @@ public class Person {
     private String picture;
     private String name;
 
+    private boolean sharing;
+
+
     private Map<String, Room> rooms;
     private Map<String, Object> myRooms;
 
@@ -30,5 +33,10 @@ public class Person {
 
     public Map<String, Object> getMyRooms() {
         return myRooms;
+    }
+
+
+    public boolean isSharing() {
+        return sharing;
     }
 }
