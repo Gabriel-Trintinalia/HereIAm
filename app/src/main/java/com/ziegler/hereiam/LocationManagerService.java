@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Location;
@@ -25,7 +24,7 @@ import com.google.android.gms.location.LocationServices;
 /**
  * Created by Gabriel on 27/08/2016.
  */
-public class LocationManager extends Service implements GoogleApiClient.ConnectionCallbacks,
+public class LocationManagerService extends Service implements GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener, LocationListener {
     // Google client to interact with Google API
     private static GoogleApiClient mGoogleApiClient;
@@ -38,14 +37,14 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
     private boolean mRequestingLocationUpdates = true;
     private static String TAG = "LOCATIONMANAGER";
 
-    public LocationManager() {
+    public LocationManagerService() {
+
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction("com.ziegler.utracker.CHANGE_SETTINGS");
+
         createLocationRequest();
         buildGoogleApiClient();
     }
@@ -103,7 +102,6 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
         if (mRequestingLocationUpdates) {
             startLocationUpdates();
         }
-
         FirebaseUtil.postLocation(getLastLocation());
     }
 
@@ -122,6 +120,8 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
     public void onLocationChanged(Location location) {
         Log.d(TAG, "Location: " + location.toString());
         FirebaseUtil.postLocation(location);
+
+        MapActivity.setLastKnownlocation(location);
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -157,6 +157,7 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
     }
 
     public static Location getLastLocation() {
+
         try {
             Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
             return mLastLocation;
@@ -165,4 +166,5 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
         }
         return null;
     }
+
 }

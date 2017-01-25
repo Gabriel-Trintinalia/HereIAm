@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,7 +28,6 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.ChildEventListener;
@@ -55,6 +55,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Room room;
     private Person person;
 
+    private static android.location.Location lastKnownlocation;
 
     private HashMap<String, Marker> marker = new HashMap<>();
     private HashMap<DatabaseReference, ValueEventListener> eventListenersList = new HashMap<>();
@@ -99,18 +100,18 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     public void onMapReady(GoogleMap map) {
         mMap = map;
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_FINE_LOCATION);
+
+            return;
         }
 
         mMap.setMyLocationEnabled(true);
-
         //LatLng loc = new LatLng(-37.837329, 144.986561);
         setCenterMap(mMap);
 
-        FirebaseUtil.getRoomsRef().child(roomKey).addValueEventListener(new ValueEventListener() {
+        ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 toolbar.setTitle(roomName);
@@ -125,9 +126,14 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
-        });
-    }
+        };
 
+        DatabaseReference ref = FirebaseUtil.getRoomsRef().child(roomKey);
+        ref.addValueEventListener(listener);
+        eventListenersList.put(ref, listener);
+
+
+    }
 
     //
     // Add content in the map
@@ -190,50 +196,55 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }
 
 
-    private void setCenterMap(GoogleMap map) {
+    private void setCenterMap(final GoogleMap map) {
 
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        Criteria criteria = new Criteria();
-
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return;
-        }
-
-        android.location.Location location = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
-        if (location != null) {
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
-
+        if (lastKnownlocation != null) {
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(lastKnownlocation.getLatitude(), lastKnownlocation.getLongitude()), 13));
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                    .target(new LatLng(lastKnownlocation.getLatitude(), lastKnownlocation.getLongitude()))      // Sets the center of the map to location user
                     .zoom(14)                   // Sets the zoom
                     .build();                   // Creates a CameraPosition from the builder
 
             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        }
-    }
-
-    private void calculateBoundary(GoogleMap map) {
-
-
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (String k : marker.keySet()) {
-            builder.include(marker.get(k).getPosition());
+            return;
         }
 
-        builder.include(map.getCameraPosition().target);
-        // Creates a CameraPosition from the builder
+        final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        final Criteria criteria = new Criteria();
+        try {
+            locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, new LocationListener() {
+                @Override
+                public void onLocationChanged(android.location.Location location) {
+                    lastKnownlocation = location;
+                    if (lastKnownlocation != null) {
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), 13));
+                        CameraPosition cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(location.getLatitude(), location.getLongitude()))      // Sets the center of the map to location user
+                                .zoom(14)                   // Sets the zoom
+                                .build();                   // Creates a CameraPosition from the builder
 
-        LatLngBounds bounds = builder.build();
-        int padding = 100; // offset from edges of the map in pixels
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+                        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                    }
+                }
 
+                @Override
+                public void onStatusChanged(String s, int i, Bundle bundle) {
+
+                }
+
+                @Override
+                public void onProviderEnabled(String s) {
+
+                }
+
+                @Override
+                public void onProviderDisabled(String s) {
+
+                }
+            }, null);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -289,6 +300,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             alert.setPositiveButton("Exit", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
+                    removeListeners();
                     FirebaseUtil.exitRoom(FirebaseUtil.getCurrentUserId(), roomKey);
                     finish();
 
@@ -348,8 +360,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Person person = dataSnapshot.getValue(Person.class);
-                if ((person == null || (person.getRooms()) == null) || (!person.getRooms().containsKey(roomKey)))
+                if ((person == null || (person.getRooms()) == null) || (!person.getRooms().containsKey(roomKey))) {
+                    removeListeners();
                     finish();
+                }
             }
 
             @Override
@@ -419,8 +433,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private void addSharingLocationUser() {
 
         ChildEventListener listener = new ChildEventListener() {
-
-
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 if (dataSnapshot.getKey() == "sharing")
@@ -431,7 +443,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
                 if (dataSnapshot.getKey().equals("sharing")) {
-                    Intent intent = new Intent(MapActivity.this, com.ziegler.hereiam.LocationManager.class);
+                    Intent intent = new Intent(MapActivity.this, LocationManagerService.class);
                     if ((boolean) dataSnapshot.getValue()) {
                         startService(intent);
                     } else {
@@ -461,6 +473,28 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         database.addChildEventListener(listener);
         //  eventListenersList.put(database, listener);
     }
+
+    public static void setLastKnownlocation(android.location.Location lastKnownlocation) {
+        MapActivity.lastKnownlocation = lastKnownlocation;
+    }
+
+
+    /*private void calculateBoundary(GoogleMap map) {
+
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (String k : marker.keySet()) {
+            builder.include(marker.get(k).getPosition());
+        }
+
+        builder.include(map.getCameraPosition().target);
+        // Creates a CameraPosition from the builder
+
+        LatLngBounds bounds = builder.build();
+        int padding = 100; // offset from edges of the map in pixels
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+
+    }*/
 
 
 }

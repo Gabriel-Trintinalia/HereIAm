@@ -53,7 +53,7 @@
         </activity>
 
         <service
-            android:name=".LocationManager"
+            android:name=".LocationManagerService"
             android:enabled="true"
             android:exported="true" />
 
