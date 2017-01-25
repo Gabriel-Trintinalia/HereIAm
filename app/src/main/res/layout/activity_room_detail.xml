@@ -87,8 +87,8 @@
                         android:id="@+id/icon_add_participant"
                         android:layout_width="@dimen/icon_add_participant_size"
                         android:layout_height="@dimen/icon_add_participant_size"
-                        android:layout_marginLeft="@dimen/common_padding"
-                        android:layout_marginStart="@dimen/common_padding"
+                        android:layout_marginLeft="28dp"
+                        android:layout_marginStart="28dp"
                         android:src="@drawable/ic_add_person"
                         android:tint="@color/secondary_text" />
 
@@ -137,7 +137,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="@dimen/margin_exit_label_button"
+                        android:layout_marginLeft="28dp"
                         android:text="@string/exit_map"
                         android:textColor="@color/warn_button"
                         android:textSize="@dimen/normal_size_text" />

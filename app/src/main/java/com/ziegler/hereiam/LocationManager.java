@@ -67,18 +67,17 @@ public class LocationManager extends Service implements GoogleApiClient.Connecti
                 notificationIntent, 0);
 
         Bitmap icon = BitmapFactory.decodeResource(getResources(),
-                R.drawable.ic_add_person);
+                R.drawable.ic_share_map);
 
         Notification notification = new NotificationCompat.Builder(this)
                 .setContentTitle("Sharing")
-                .setTicker("Truiton Music Player")
                 .setContentText("You are sharing your location.")
-                .setSmallIcon(R.drawable.ic_add_person)
+                .setSmallIcon(R.drawable.ic_notification)
                 .setLargeIcon(icon)
                 .setContentIntent(pendingIntent)
                 .setOngoing(true).build();
 
-        startForeground(101,
+        startForeground(109,
                 notification);
 
         return START_STICKY;

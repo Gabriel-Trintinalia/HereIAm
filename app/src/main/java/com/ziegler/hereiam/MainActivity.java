@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
-        Query allPostsQuery = FirebaseUtil.getCurrentUserRef().child("rooms");
+        Query allPostsQuery = FirebaseUtil.getCurrentUserRef().child("rooms").orderByChild("sharing");
         mAdapter = getFirebaseRecyclerAdapter(allPostsQuery);
 
         mRecyclerView.setAdapter(mAdapter);
@@ -90,8 +90,14 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupRoomItemList(final RoomItemListViewHolder roomItemListViewHolder, final RoomItemList roomItemList, final int position, final String roomKey) {
         roomItemListViewHolder.setName(roomItemList.getName());
-
         roomItemListViewHolder.setPicture(roomItemList.getPicture());
+
+        if (roomItemList.isSharing())
+            roomItemListViewHolder.setSubText("Active");
+        else
+            roomItemListViewHolder.setSubText("Invisible");
+
+
         roomItemListViewHolder.setOnClickListener(new RoomItemListViewHolder.RoomItemClickListener() {
             @Override
             public void openRoom() {
@@ -101,7 +107,6 @@ public class MainActivity extends AppCompatActivity {
                 room.putExtra(getString(R.string.NAME_ROOM), roomItemList.getName());
 
                 // shareRoom(roomKey);
-                startSharingLocationService();
                 startActivity(room);
             }
         });
@@ -154,14 +159,9 @@ public class MainActivity extends AppCompatActivity {
             finish();
         }
 
-
         return super.onOptionsItemSelected(item);
     }
 
-    private void startSharingLocationService() {
-
-
-    }
 
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);

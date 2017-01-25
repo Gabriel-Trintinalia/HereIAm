@@ -12,12 +12,12 @@
     <dimen name="mini_text_size">12sp</dimen>
     <dimen name="item_line_size">48dp</dimen>
     <dimen name="icon_add_participant_size">24dp</dimen>
-    <dimen name="margin_add_participant_button">48dp</dimen>
+    <dimen name="margin_add_participant_button">30dp</dimen>
     <dimen name="normal_size_text">16sp</dimen>
     <dimen name="medium_line_button">60dp</dimen>
     <dimen name="exit_map_icon_size">24dp</dimen>
     <dimen name="margin_icon_exit">20dp</dimen>
-    <dimen name="margin_exit_label_button">48dp</dimen>
+    <dimen name="margin_exit_label_button">30dp</dimen>
     <dimen name="button_login">200dp</dimen>
 
 </resources>
