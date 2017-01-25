@@ -20,7 +20,7 @@ public class RoomItemListViewHolder extends RecyclerView.ViewHolder {
     private TextView mRoomNameTextView;
     private TextView mTextSubText;
 
-
+    private CircleImageView mImageIconStatus;
     private CircleImageView mImageProfile;
 
     private RelativeLayout button;
@@ -30,6 +30,9 @@ public class RoomItemListViewHolder extends RecyclerView.ViewHolder {
 
         mRoomNameTextView = (TextView) itemView.findViewById(R.id.main_text);
         mImageProfile = (CircleImageView) itemView.findViewById(R.id.profile_icon);
+
+        mImageIconStatus = (CircleImageView) itemView.findViewById(R.id.status_icon);
+
         mTextSubText = (TextView) itemView.findViewById(R.id.ic_sub_text);
     }
 
@@ -51,6 +54,14 @@ public class RoomItemListViewHolder extends RecyclerView.ViewHolder {
 
     public void setSubText(String s) {
         mTextSubText.setText(s);
+    }
+
+    public void setVisibilityStatusIcon(boolean status) {
+        if (status)
+            mImageIconStatus.setVisibility(View.VISIBLE);
+        else
+            mImageIconStatus.setVisibility(View.GONE);
+
     }
 
 

@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="74dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/info_background"
     android:clickable="true">
 
@@ -10,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:background="?android:attr/selectableItemBackground"
         android:clickable="true"
@@ -43,24 +45,36 @@
 
         </LinearLayout>
 
-        <ImageView
-            android:id="@+id/general_button_go"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true" />
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/profile_icon"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginLeft="16dp"
-            android:src="@drawable/ic_map"
-            android:transitionName="@string/transition_icon"
-            android:layout_marginStart="17dp"
-            android:layout_centerVertical="true"
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="16dp"
+
+            android:layout_marginStart="16dp">
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/profile_icon"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_map"
+                android:transitionName="@string/transition_icon" />
+
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/status_icon"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignBottom="@id/profile_icon"
+                android:layout_alignEnd="@id/profile_icon"
+                android:layout_alignRight="@id/profile_icon"
+                app:civ_border_width="1dp"
+                app:civ_border_color="#fff"
+                android:src="@drawable/ic_status_onine" />
+        </RelativeLayout>
     </RelativeLayout>
 
 </RelativeLayout>
