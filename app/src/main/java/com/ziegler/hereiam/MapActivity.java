@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Point;
 import android.graphics.drawable.Drawable;
 import android.location.Criteria;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -21,6 +23,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Switch;
 
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.Target;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -55,8 +60,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     private Menu menu;
     private Room room;
     private Person person;
+    private ShowcaseView showcaseView;
 
     private static android.location.Location lastKnownlocation;
+    private int counter = 0;
 
     private Switch mSwitch;
 
@@ -83,6 +90,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         setSwitchAction();
         addSharingLocationUser();
+        showTutorial();
 
     }
 
@@ -329,7 +337,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
     //
     // Show map details
     //
@@ -345,7 +352,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         // Check if the user still belongs to the map.
         checkRoomAvailable();
     }
-
 
     //
     // Validation to check if the user belongs to the map.
@@ -370,7 +376,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
 
     }
-
 
     @Override
     public void onPause() {
@@ -536,4 +541,67 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     }*/
 
 
+    private void showTutorial() {
+
+        final ViewTarget targetMap = new ViewTarget(R.id.map, this);
+        final ViewTarget targetActiveSharing = new ViewTarget(R.id.switch_share_location, this);
+        final ToolbarActionItemTarget targetInvitePeople = new ToolbarActionItemTarget(toolbar, R.id.action_invite);
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                switch (counter) {
+                    case 0:
+                        showcaseView.setShowcase(targetActiveSharing, true);
+                        showcaseView.setContentTitle("Share your position");
+                        showcaseView.setContentText("Tap here to activate or deactivate the location sharing");
+                        showcaseView.setButtonText("Next");
+                        break;
+
+                    case 1:
+                        showcaseView.setShowcase(targetInvitePeople, true);
+                        showcaseView.setContentTitle("Invite people");
+                        showcaseView.setContentText("Share the map with your friends and see their location");
+                        showcaseView.setButtonText("Got it");
+                        break;
+                    case 2:
+                        showcaseView.hide();
+                        break;
+                }
+                counter++;
+            }
+        };
+
+        showcaseView = new ShowcaseView.Builder(this)
+                .setTarget(targetMap)
+                .withHoloShowcase()
+                .setContentTitle("Map")
+                .setContentText("Your friends will appear here.")
+                .setStyle(R.style.CustomShowcaseTheme3)
+                .setOnClickListener(listener)
+                .build();
+
+        showcaseView.setButtonText("Next");
+    }
+
+    public class ToolbarActionItemTarget implements Target {
+
+        private final Toolbar toolbar;
+        private final int menuItemId;
+
+        public ToolbarActionItemTarget(Toolbar toolbar, @IdRes int itemId) {
+            this.toolbar = toolbar;
+            this.menuItemId = itemId;
+        }
+
+        @Override
+        public Point getPoint() {
+            return new ViewTarget(toolbar.findViewById(menuItemId)).getPoint();
+        }
+
+    }
+
 }
+
+

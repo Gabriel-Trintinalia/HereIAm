@@ -13,9 +13,16 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.github.amlcurran.showcaseview.OnShowcaseEventListener;
+import com.github.amlcurran.showcaseview.ShowcaseView;
+import com.github.amlcurran.showcaseview.targets.Target;
+import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Query;
 import com.ziegler.hereiam.Models.RoomItemList;
@@ -31,12 +38,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_FINE_LOCATION = 848;
 
     private FloatingActionButton mFab;
-    final Context context = this;
 
     private Menu menu;
-
+    private ShowcaseView showcaseView;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter<RoomItemListViewHolder> mAdapter;
+    private int counter = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +66,9 @@ public class MainActivity extends AppCompatActivity {
         Query allPostsQuery = FirebaseUtil.getCurrentUserRef().child("rooms").orderByChild("sharing");
         mAdapter = getFirebaseRecyclerAdapter(allPostsQuery);
 
+        showTutorial();
         mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setVisibility(View.GONE);
         // adapter.addFragment(new EarningsFragment(), "EARNINGS");
 
 
@@ -72,10 +81,10 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(room);
             }
         });
-
     }
 
-    private FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder> getFirebaseRecyclerAdapter(Query query) {
+    private FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder> getFirebaseRecyclerAdapter
+            (Query query) {
         return new FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder>(
                 RoomItemList.class, R.layout.room_item_list, RoomItemListViewHolder.class, query) {
             @Override
@@ -205,6 +214,71 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return false;
+    }
+
+
+    private void showTutorial() {
+
+        final ViewTarget target = new ViewTarget(R.id.fab, this);
+
+        View.OnClickListener listener = new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                switch (counter) {
+                    case 0:
+                        showcaseView.setShowcase(target, true);
+                        showcaseView.setContentTitle("Create a map");
+                        showcaseView.setContentText("Tap here to create and share a map");
+                        showcaseView.setButtonText("Got it");
+                        break;
+                    case 2:
+                        showcaseView.hide();
+                        break;
+                }
+                counter++;
+
+
+            }
+        };
+
+        RelativeLayout.LayoutParams lps = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_BOTTOM);
+        lps.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+        int margin = ((Number) (getResources().getDisplayMetrics().density * 12)).intValue();
+        lps.setMargins(margin, margin, margin, margin);
+
+        showcaseView = new ShowcaseView.Builder(this)
+                .setTarget(Target.NONE)
+                .setContentTitle("Welcome")
+                .setContentText("Your list of maps will appear here")
+
+                .setStyle(R.style.CustomShowcaseTheme2)
+                .setOnClickListener(listener)
+                .build();
+        showcaseView.setButtonText("Next");
+        showcaseView.setButtonPosition(lps);
+        showcaseView.setOnShowcaseEventListener(new OnShowcaseEventListener() {
+            @Override
+            public void onShowcaseViewHide(ShowcaseView showcaseView) {
+                mRecyclerView.setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onShowcaseViewDidHide(ShowcaseView showcaseView) {
+
+            }
+
+            @Override
+            public void onShowcaseViewShow(ShowcaseView showcaseView) {
+
+            }
+
+            @Override
+            public void onShowcaseViewTouchBlocked(MotionEvent motionEvent) {
+
+            }
+        });
     }
 
 }
