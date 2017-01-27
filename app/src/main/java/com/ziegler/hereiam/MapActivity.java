@@ -19,6 +19,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Switch;
 
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -57,6 +58,8 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private static android.location.Location lastKnownlocation;
 
+    private Switch mSwitch;
+
     private HashMap<String, Marker> marker = new HashMap<>();
     private HashMap<DatabaseReference, ValueEventListener> eventListenersList = new HashMap<>();
 
@@ -77,7 +80,10 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
 
         mapFragment.getMapAsync(MapActivity.this);
+
+        setSwitchAction();
         addSharingLocationUser();
+
     }
 
     private void setActionBar() {
@@ -269,16 +275,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             startDetailActivity();  // start activity to show details of the map
         }
 
-        if (item.getItemId() == R.id.action_share_location_map) {
-            if (room.isSharing()) {
-                FirebaseUtil.setSharingRoom(FirebaseUtil.getCurrentUserId(), roomKey, false);
-                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map));
-            } else {
-                FirebaseUtil.setSharingRoom(FirebaseUtil.getCurrentUserId(), roomKey, true);
-                menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map_sharing));
-            }
-        }
-
 
         if (item.getItemId() == R.id.action_invite) {
 
@@ -413,9 +409,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 room = dataSnapshot.getValue(Room.class);
-                if (room.isSharing())
-                    menu.getItem(0).setIcon(getResources().getDrawable(R.drawable.ic_map_sharing));
-
+                if (room.isSharing()) {
+                    mSwitch.setChecked(true);
+                }
             }
 
             @Override
@@ -478,6 +474,49 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         MapActivity.lastKnownlocation = lastKnownlocation;
     }
 
+
+    private void setSwitchAction() {
+
+        mSwitch = (Switch) findViewById(R.id.switch_share_location);
+
+        mSwitch.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder alert = new AlertDialog.Builder(MapActivity.this);
+
+                String buttonPositive;
+                if (mSwitch.isChecked()) {
+                    alert.setTitle("Share location"); //Set Alert dialog title here
+                    alert.setMessage("Do you want to share your location with the users in this room?");
+                    buttonPositive = "Share";
+                } else {
+
+                    alert.setTitle("Stop sharing"); //Set Alert dialog title here
+                    alert.setMessage("Do you want to stop sharing?");
+                    buttonPositive = "Stop";
+                }
+
+                alert.setPositiveButton(buttonPositive, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        FirebaseUtil.setSharingRoom(FirebaseUtil.getCurrentUserId(), roomKey, mSwitch.isChecked());
+                    }
+                });
+
+                alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        mSwitch.setChecked(!mSwitch.isChecked());
+                        dialog.cancel();
+                    }
+                });
+
+                AlertDialog alertDialog = alert.create();
+                alertDialog.show();
+            }
+        });
+
+
+    }
 
     /*private void calculateBoundary(GoogleMap map) {
 
