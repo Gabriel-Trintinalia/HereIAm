@@ -1,6 +1,7 @@
 package com.ziegler.hereiam;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -15,6 +16,8 @@ import com.bumptech.glide.request.target.Target;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Marker;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Created by Gabriel on 23/01/2017.
@@ -75,4 +78,17 @@ public class Util {
                 })
                 .into(50, 50);
     }
+
+
+    public static boolean isFirstRun(Context context) {
+
+        SharedPreferences prefs = null;
+        prefs = context.getSharedPreferences("com.ziegler.hereiam", MODE_PRIVATE);
+        if (prefs.getBoolean("firstrun", true)) {
+            prefs.edit().putBoolean("firstrun", false).commit();
+            return true;
+        }
+        return false;
+    }
 }
+

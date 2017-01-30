@@ -90,8 +90,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         setSwitchAction();
         addSharingLocationUser();
-        showTutorial();
-
+        if (Util.isFirstRun(this)) {
+            showTutorial();
+        }
     }
 
     private void setActionBar() {

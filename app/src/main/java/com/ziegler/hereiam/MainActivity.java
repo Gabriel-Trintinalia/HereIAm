@@ -39,7 +39,10 @@ public class MainActivity extends AppCompatActivity {
 
     private FloatingActionButton mFab;
 
+    protected static boolean isFirstRun;
+
     private Menu menu;
+
     private ShowcaseView showcaseView;
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter<RoomItemListViewHolder> mAdapter;
@@ -66,10 +69,12 @@ public class MainActivity extends AppCompatActivity {
         Query allPostsQuery = FirebaseUtil.getCurrentUserRef().child("rooms").orderByChild("sharing");
         mAdapter = getFirebaseRecyclerAdapter(allPostsQuery);
 
-        showTutorial();
         mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.setVisibility(View.GONE);
-        // adapter.addFragment(new EarningsFragment(), "EARNINGS");
+
+        if (Util.isFirstRun(this)) {
+            mRecyclerView.setVisibility(View.GONE);
+            showTutorial();
+        }
 
 
         mFab = (FloatingActionButton) findViewById(R.id.fab);
@@ -81,6 +86,8 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(room);
             }
         });
+
+
     }
 
     private FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder> getFirebaseRecyclerAdapter
@@ -165,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+
     private boolean hasPermissions() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
@@ -190,7 +198,6 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String permissions[], int[] grantResults) {
@@ -205,7 +212,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -215,7 +221,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
-
 
     private void showTutorial() {
 
@@ -234,6 +239,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     case 2:
                         showcaseView.hide();
+                        mRecyclerView.setVisibility(View.VISIBLE);
                         break;
                 }
                 counter++;
@@ -252,10 +258,10 @@ public class MainActivity extends AppCompatActivity {
                 .setTarget(Target.NONE)
                 .setContentTitle("Welcome")
                 .setContentText("Your list of maps will appear here")
-
                 .setStyle(R.style.CustomShowcaseTheme2)
                 .setOnClickListener(listener)
                 .build();
+
         showcaseView.setButtonText("Next");
         showcaseView.setButtonPosition(lps);
         showcaseView.setOnShowcaseEventListener(new OnShowcaseEventListener() {
@@ -276,9 +282,9 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onShowcaseViewTouchBlocked(MotionEvent motionEvent) {
-
             }
         });
     }
+
 
 }
