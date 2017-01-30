@@ -30,9 +30,10 @@ public class LocationManagerService extends Service implements GoogleApiClient.C
     private static GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     // Location updates intervals in sec
-    private static int UPDATE_INTERVAL = 20000; // 10 sec
-    private static int FATEST_INTERVAL = 10000; // 5 sec
+    private static int UPDATE_INTERVAL = 30000; // 10 sec
+    private static int FATEST_INTERVAL = 30000; // 5 sec
     private static int DISPLACEMENT = 10; // 10 meters
+
     // boolean flag to toggle periodic location updates
     private boolean mRequestingLocationUpdates = true;
     private static String TAG = "LOCATIONMANAGER";

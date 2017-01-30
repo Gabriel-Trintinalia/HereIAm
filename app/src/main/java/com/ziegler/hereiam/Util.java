@@ -1,5 +1,6 @@
 package com.ziegler.hereiam;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -90,5 +91,62 @@ public class Util {
         }
         return false;
     }
+
+
+      /*private void calculateBoundary(GoogleMap map) {
+
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (String k : marker.keySet()) {
+            builder.include(marker.get(k).getPosition());
+        }
+
+        builder.include(map.getCameraPosition().target);
+        // Creates a CameraPosition from the builder
+
+        LatLngBounds bounds = builder.build();
+        int padding = 100; // offset from edges of the map in pixels
+        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
+
+    }*/
+
+
+    private boolean isMyServiceRunning(Class<?> serviceClass, Context context) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.getName().equals(service.service.getClassName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+/*
+    private void shareRoom(String keyRoom) {
+
+        String dld = getString(R.string.DynamicLinkDomain);
+        String link = "https://james-1b462.firebaseapp.com/room/?cod=";
+
+        String pck = "&apn=com.ziegler.hereiam";
+        String url = null;
+        URL urla = null;
+        try {
+            url = dld + "?link=" + link + keyRoom.replace("-", "%2D") + pck;
+
+            URI uri = new URI(url);
+            urla = uri.toURL();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, urla.toString());
+        sendIntent.setType("text/plain");
+        startActivity(Intent.createChooser(sendIntent, "Share with..."));
+    }*/
+
 }
 

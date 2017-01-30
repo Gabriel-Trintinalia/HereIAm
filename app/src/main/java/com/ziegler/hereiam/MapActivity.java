@@ -1,13 +1,11 @@
 package com.ziegler.hereiam;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.location.Criteria;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -67,6 +65,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private Switch mSwitch;
 
+    private DatabaseReference mRoomFirebaseReference;
+    private ValueEventListener mListenerRoom;
+
+    private DatabaseReference mRoomLocationFirebaseReference;
+    private ValueEventListener mListenerRoomLocation;
+
+
     private HashMap<String, Marker> marker = new HashMap<>();
     private HashMap<DatabaseReference, ValueEventListener> eventListenersList = new HashMap<>();
 
@@ -89,7 +94,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(MapActivity.this);
 
         setSwitchAction();
-        addSharingLocationUser();
+        addSharingLocationUserListener();
+        addSharingLocationListenerForThisRoomListener();
+
         if (Util.isFirstRun(this)) {
             showTutorial();
         }
@@ -113,41 +120,47 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     @Override
     public void onMapReady(GoogleMap map) {
+        setListenerRoom();
+
         mMap = map;
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this,
                     new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION},
                     MY_PERMISSIONS_FINE_LOCATION);
-
             return;
         }
 
+        mMap.getUiSettings().setTiltGesturesEnabled(false);
+        mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setMyLocationEnabled(true);
         //LatLng loc = new LatLng(-37.837329, 144.986561);
         setCenterMap(mMap);
-
-        ValueEventListener listener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                toolbar.setTitle(roomName);
-                Room room = dataSnapshot.getValue(Room.class);
-
-                removeListeners();
-                addPeople(room, roomKey);
-                addSharingLocationListenerForThisRoom();
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-            }
-        };
-
-        DatabaseReference ref = FirebaseUtil.getRoomsRef().child(roomKey);
-        ref.addValueEventListener(listener);
-        eventListenersList.put(ref, listener);
+    }
 
 
+    private void setListenerRoom() {
+
+        if (mRoomFirebaseReference == null) {
+            mRoomFirebaseReference = FirebaseUtil.getRoomsRef().child(roomKey);
+        }
+
+        if (mListenerRoom == null) {
+            mListenerRoom = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    toolbar.setTitle(roomName);
+                    Room room = dataSnapshot.getValue(Room.class);
+
+                    removeListeners();
+                    addPeople(room, roomKey);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            };
+        }
+        mRoomFirebaseReference.addValueEventListener(mListenerRoom);
     }
 
     //
@@ -181,7 +194,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                     return;
                 }
 
-
                 if (marker.containsKey(key)) {
                     marker.get(key).setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
                 } else {
@@ -210,7 +222,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         };
     }
 
-
     private void setCenterMap(final GoogleMap map) {
 
         if (lastKnownlocation != null) {
@@ -225,7 +236,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         final LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        final Criteria criteria = new Criteria();
         try {
             locationManager.requestSingleUpdate(LocationManager.NETWORK_PROVIDER, new LocationListener() {
                 @Override
@@ -351,13 +361,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     protected void onStart() {
         super.onStart();
         // Check if the user still belongs to the map.
-        checkRoomAvailable();
+        addRoomAvailableListener();
     }
 
     //
     // Validation to check if the user belongs to the map.
     //
-    private void checkRoomAvailable() {
+    private void addRoomAvailableListener() {
 
         FirebaseUtil.getCurrentUserRef().addValueEventListener(new ValueEventListener() {
             @Override
@@ -371,16 +381,15 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
-
-
     }
 
     @Override
     public void onPause() {
         removeListeners();
+        mRoomFirebaseReference.removeEventListener(mListenerRoom);
+        mRoomLocationFirebaseReference.removeEventListener(mListenerRoomLocation);
         super.onPause();
 
     }
@@ -398,42 +407,31 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
     }
 
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void addSharingLocationListenerForThisRoom() {
-
-        ValueEventListener listener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                room = dataSnapshot.getValue(Room.class);
-                if (room.isSharing()) {
-                    mSwitch.setChecked(true);
+    private void addSharingLocationListenerForThisRoomListener() {
+        if (mListenerRoomLocation == null) {
+            mListenerRoomLocation = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    room = dataSnapshot.getValue(Room.class);
+                    if (room.isSharing()) {
+                        mSwitch.setChecked(true);
+                    }
                 }
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
 
-            }
-        };
+                }
+            };
+        }
 
-        DatabaseReference database = FirebaseUtil.getCurrentUserRef().child("rooms").child(roomKey);
-        database.addValueEventListener(listener);
-        eventListenersList.put(database, listener);
+        if (mRoomLocationFirebaseReference == null)
+            mRoomLocationFirebaseReference = FirebaseUtil.getCurrentUserRef().child("rooms").child(roomKey);
+
+        mRoomLocationFirebaseReference.addValueEventListener(mListenerRoomLocation);
     }
 
-
-    private void addSharingLocationUser() {
-
+    private void addSharingLocationUserListener() {
         ChildEventListener listener = new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -443,31 +441,26 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
                 if (dataSnapshot.getKey().equals("sharing")) {
                     Intent intent = new Intent(MapActivity.this, LocationManagerService.class);
                     if ((boolean) dataSnapshot.getValue()) {
                         startService(intent);
                     } else {
                         stopService(intent);
-
                     }
                 }
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
             }
 
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         };
 
@@ -480,11 +473,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         MapActivity.lastKnownlocation = lastKnownlocation;
     }
 
-
     private void setSwitchAction() {
 
         mSwitch = (Switch) findViewById(R.id.switch_share_location);
-
         mSwitch.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -520,26 +511,7 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 alertDialog.show();
             }
         });
-
-
     }
-
-    /*private void calculateBoundary(GoogleMap map) {
-
-
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (String k : marker.keySet()) {
-            builder.include(marker.get(k).getPosition());
-        }
-
-        builder.include(map.getCameraPosition().target);
-        // Creates a CameraPosition from the builder
-
-        LatLngBounds bounds = builder.build();
-        int padding = 100; // offset from edges of the map in pixels
-        map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding));
-
-    }*/
 
 
     private void showTutorial() {
@@ -573,7 +545,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 counter++;
             }
         };
-
         showcaseView = new ShowcaseView.Builder(this)
                 .setTarget(targetMap)
                 .withHoloShowcase()

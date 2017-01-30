@@ -1,7 +1,5 @@
 package com.ziegler.hereiam;
 
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -27,21 +25,11 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Query;
 import com.ziegler.hereiam.Models.RoomItemList;
 
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static final int MY_PERMISSIONS_FINE_LOCATION = 848;
 
     private FloatingActionButton mFab;
-
-    protected static boolean isFirstRun;
-
-    private Menu menu;
 
     private ShowcaseView showcaseView;
     private RecyclerView mRecyclerView;
@@ -53,9 +41,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        final String userID = FirebaseUtil.getCurrentUserId();
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -63,19 +48,16 @@ public class MainActivity extends AppCompatActivity {
         linearLayoutManager.setReverseLayout(true);
         linearLayoutManager.setStackFromEnd(true);
         mRecyclerView = (RecyclerView) findViewById(R.id.main_recycler_view);
-
         mRecyclerView.setLayoutManager(linearLayoutManager);
 
         Query allPostsQuery = FirebaseUtil.getCurrentUserRef().child("rooms").orderByChild("sharing");
         mAdapter = getFirebaseRecyclerAdapter(allPostsQuery);
-
         mRecyclerView.setAdapter(mAdapter);
 
         if (Util.isFirstRun(this)) {
             mRecyclerView.setVisibility(View.GONE);
             showTutorial();
         }
-
 
         mFab = (FloatingActionButton) findViewById(R.id.fab);
         mFab.setOnClickListener(new View.OnClickListener() {
@@ -86,10 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(room);
             }
         });
-
-
     }
-
     private FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder> getFirebaseRecyclerAdapter
             (Query query) {
         return new FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder>(
@@ -103,7 +82,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onViewRecycled(RoomItemListViewHolder holder) {
                 super.onViewRecycled(holder);
-//                FirebaseUtil.getLikesRef().child(holder.mPostKey).removeEventListener(holder.mLikeListener);
             }
         };
     }
@@ -120,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
             roomItemListViewHolder.setSubText("Invisible");
         }
 
-
         roomItemListViewHolder.setOnClickListener(new RoomItemListViewHolder.RoomItemClickListener() {
             @Override
             public void openRoom() {
@@ -130,48 +107,18 @@ public class MainActivity extends AppCompatActivity {
                     room.putExtra(getString(R.string.EVENT_KEY), roomKey);
                     room.putExtra(getString(R.string.NAME_ROOM), roomItemList.getName());
 
-                    // shareRoom(roomKey);
                     startActivity(room);
                 }
             }
         });
     }
 
-    private void shareRoom(String keyRoom) {
-
-        String dld = getString(R.string.DynamicLinkDomain);
-        String link = "https://james-1b462.firebaseapp.com/room/?cod=";
-
-        String pck = "&apn=com.ziegler.hereiam";
-        String url = null;
-        URL urla = null;
-        try {
-            url = dld + "?link=" + link + keyRoom.replace("-", "%2D") + pck;
-
-            URI uri = new URI(url);
-            urla = uri.toURL();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, urla.toString());
-        sendIntent.setType("text/plain");
-        startActivity(Intent.createChooser(sendIntent, "Share with..."));
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main_menu, menu);
-        this.menu = menu;
-
         return true;
     }
-
 
     private boolean hasPermissions() {
         if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -180,22 +127,7 @@ public class MainActivity extends AppCompatActivity {
                     MY_PERMISSIONS_FINE_LOCATION);
             return false;
         }
-
         return true;
-    }
-
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // handle arrow click here
-        if (item.getItemId() == R.id.action_sign_out) {
-            FirebaseAuth.getInstance().signOut();
-            Intent login = new Intent(MainActivity.this, WelcomeActivity.class);
-            startActivity(login);
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -210,16 +142,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
         }
-    }
-
-    private boolean isMyServiceRunning(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void showTutorial() {
@@ -284,6 +206,19 @@ public class MainActivity extends AppCompatActivity {
             public void onShowcaseViewTouchBlocked(MotionEvent motionEvent) {
             }
         });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        if (item.getItemId() == R.id.action_sign_out) {
+            FirebaseAuth.getInstance().signOut();
+            Intent login = new Intent(MainActivity.this, WelcomeActivity.class);
+            startActivity(login);
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
