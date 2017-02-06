@@ -148,5 +148,25 @@ public class Util {
         startActivity(Intent.createChooser(sendIntent, "Share with..."));
     }*/
 
+
+    public static String getDifferenceMilli(long firstDate, long secondDate) {
+        long diff = (firstDate - secondDate) / 1000;
+        if (diff < 60) return "now";
+        if (diff < 3600)
+            return (diff / 60) + " minutes ago";
+
+        if (diff < 7200)
+            return ("1 hour ago");
+
+        if (diff < 86400)
+            return (diff / 3600) + " hours ago";
+
+        if (diff > 86400)
+            return (diff / 86400) + " days ago";
+
+        return "";
+    }
+
+
 }
 

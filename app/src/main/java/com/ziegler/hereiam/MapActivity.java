@@ -131,7 +131,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         }
 
         mMap.getUiSettings().setTiltGesturesEnabled(false);
-        mMap.getUiSettings().setMyLocationButtonEnabled(false);
         mMap.setMyLocationEnabled(true);
         //LatLng loc = new LatLng(-37.837329, 144.986561);
         setCenterMap(mMap);
@@ -150,7 +149,6 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     toolbar.setTitle(roomName);
                     Room room = dataSnapshot.getValue(Room.class);
-
                     removeListeners();
                     addPeople(room, roomKey);
                 }

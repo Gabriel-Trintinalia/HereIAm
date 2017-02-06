@@ -19,12 +19,12 @@ import android.widget.LinearLayout;
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.appinvite.AppInviteInvitation;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.ziegler.hereiam.Models.Room;
-import com.ziegler.hereiam.Models.RoomItemList;
 
 
 public class RoomDetailActivity extends AppCompatActivity {
@@ -66,7 +66,6 @@ public class RoomDetailActivity extends AppCompatActivity {
                         .setCallToActionText("Join")
                         .build();
 
-
                 startActivityForResult(intent, REQUEST_INVITE);
             }
         });
@@ -92,7 +91,6 @@ public class RoomDetailActivity extends AppCompatActivity {
             }
         });
 
-
         buttonExitMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -116,12 +114,10 @@ public class RoomDetailActivity extends AppCompatActivity {
                 });
                 AlertDialog alertDialog = alert.create();
                 alertDialog.show();
-
             }
         });
 
     }
-
 
     private void setActionBar() {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -143,13 +139,13 @@ public class RoomDetailActivity extends AppCompatActivity {
     }
 
 
-    private FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder> getFirebaseRecyclerAdapter(Query query) {
-        return new FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder>(
-                RoomItemList.class, R.layout.room_item_list, RoomItemListViewHolder.class, query) {
+    private FirebaseRecyclerAdapter<Room, RoomItemListViewHolder> getFirebaseRecyclerAdapter(Query query) {
+        return new FirebaseRecyclerAdapter<Room, RoomItemListViewHolder>(
+                Room.class, R.layout.room_item_list, RoomItemListViewHolder.class, query) {
             @Override
             public void populateViewHolder(final RoomItemListViewHolder itemViewHolder,
-                                           final RoomItemList room, final int position) {
-                setupRoomItemList(itemViewHolder, room, position, null);
+                                           final Room room, final int position) {
+                setupRoomItemList(itemViewHolder, room, position, getRef(position).getKey());
             }
 
             @Override
@@ -160,18 +156,50 @@ public class RoomDetailActivity extends AppCompatActivity {
         };
     }
 
-    private void setupRoomItemList(final RoomItemListViewHolder roomItemListViewHolder, final RoomItemList roomItemList, final int position, final String roomKey) {
+    private void setupRoomItemList(final RoomItemListViewHolder roomItemListViewHolder, final Room roomItemList, final int position, final String roomKey) {
         roomItemListViewHolder.setName(roomItemList.getName());
         roomItemListViewHolder.setPicture(roomItemList.getPicture());
 
         if (roomItemList.isSharing()) {
             roomItemListViewHolder.setVisibilityStatusIcon(true);
             roomItemListViewHolder.setSubText("Active");
+
+            FirebaseUtil.getLocationsRef().child(roomKey).addChildEventListener(new ChildEventListener() {
+                @Override
+                public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                    if (dataSnapshot.getKey() == "time") {
+                        long time = ((long) dataSnapshot.getValue());
+                        roomItemListViewHolder.setSubText("Active " + Util.getDifferenceMilli(time, System.currentTimeMillis()));
+                        FirebaseUtil.getLocationsRef().child(roomKey).removeEventListener(this);
+                    }
+                }
+
+                @Override
+                public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                }
+
+                @Override
+                public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
+
         } else {
             roomItemListViewHolder.setVisibilityStatusIcon(false);
             roomItemListViewHolder.setSubText("Invisible");
         }
-
     }
 
     @Override
@@ -201,4 +229,6 @@ public class RoomDetailActivity extends AppCompatActivity {
             }
         }
     }
+
+
 }

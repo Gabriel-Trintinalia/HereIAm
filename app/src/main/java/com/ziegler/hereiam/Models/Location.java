@@ -1,5 +1,10 @@
 package com.ziegler.hereiam.Models;
 
+import com.google.firebase.database.Exclude;
+import com.google.firebase.database.ServerValue;
+
+import java.util.Map;
+
 /**
  * Created by Gabriel on 09/01/2017.
  */
@@ -10,7 +15,10 @@ public class Location {
     private String name;
     private float bearing;
     private Double latitude;
+
     private Double longitude;
+
+    private Map time;
 
     public Location() {
     }
@@ -56,12 +64,23 @@ public class Location {
     }
 
 
+    public Map getTime() {
+        return time;
+    }
+
     public Location(android.location.Location loc) {
         if (loc != null) {
-            this.bearing = loc.getBearing();
+            //   this.bearing = loc.getBearing();
             this.latitude = loc.getLatitude();
             this.longitude = loc.getLongitude();
+            this.time = ServerValue.TIMESTAMP;
         }
+    }
+
+
+    @Exclude
+    public long getTimestampCreatedLong() {
+        return (long) time.get("timestamp");
     }
 
 }

@@ -11,6 +11,7 @@ public class Room {
     private String picture;
     private boolean sharing;
 
+    private long lastOfLastSharedLocation;
 
     private String owner;
     private Map<String, MemberMap> people;
@@ -36,5 +37,9 @@ public class Room {
 
     public boolean isSharing() {
         return sharing;
+    }
+
+    public long getLastOfLastSharedLocation() {
+        return lastOfLastSharedLocation;
     }
 }

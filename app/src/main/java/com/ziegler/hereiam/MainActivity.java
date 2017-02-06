@@ -23,7 +23,7 @@ import com.github.amlcurran.showcaseview.targets.Target;
 import com.github.amlcurran.showcaseview.targets.ViewTarget;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.Query;
-import com.ziegler.hereiam.Models.RoomItemList;
+import com.ziegler.hereiam.Models.Room;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -69,13 +69,14 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-    private FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder> getFirebaseRecyclerAdapter
+
+    private FirebaseRecyclerAdapter<Room, RoomItemListViewHolder> getFirebaseRecyclerAdapter
             (Query query) {
-        return new FirebaseRecyclerAdapter<RoomItemList, RoomItemListViewHolder>(
-                RoomItemList.class, R.layout.room_item_list, RoomItemListViewHolder.class, query) {
+        return new FirebaseRecyclerAdapter<Room, RoomItemListViewHolder>(
+                Room.class, R.layout.room_item_list, RoomItemListViewHolder.class, query) {
             @Override
             public void populateViewHolder(final RoomItemListViewHolder itemViewHolder,
-                                           final RoomItemList room, final int position) {
+                                           final Room room, final int position) {
                 setupRoomItemList(itemViewHolder, room, position, getRef(position).getKey());
             }
 
@@ -86,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         };
     }
 
-    private void setupRoomItemList(final RoomItemListViewHolder roomItemListViewHolder, final RoomItemList roomItemList, final int position, final String roomKey) {
+    private void setupRoomItemList(final RoomItemListViewHolder roomItemListViewHolder, final Room roomItemList, final int position, final String roomKey) {
         roomItemListViewHolder.setName(roomItemList.getName());
         roomItemListViewHolder.setPicture(roomItemList.getPicture());
 

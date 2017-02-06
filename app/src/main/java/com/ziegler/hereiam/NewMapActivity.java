@@ -91,7 +91,7 @@ public class NewMapActivity extends BaseActivity implements
             public void onClick(final View v) {
 
                 String nameMap = editNameMap.getText().toString();
-                if (TextUtils.isEmpty(nameMap)) {
+                if (TextUtils.isEmpty(nameMap.trim())) {
                     editNameMap.setError(getString(R.string.error_required_field));
                     return;
                 }

@@ -93,7 +93,7 @@ public class Main extends Thread {
             database.getReference().child("locations").child(user).setValue(users);
 
             try {
-                int randomNum = 300 + (int) (Math.random() * 500);
+                int randomNum = 20000 + (int) (Math.random() * 5000);
                 Thread.sleep(randomNum);
             } catch (InterruptedException e) {
                 e.printStackTrace();

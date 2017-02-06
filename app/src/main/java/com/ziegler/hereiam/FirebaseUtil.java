@@ -134,7 +134,6 @@ public class FirebaseUtil {
 
     public static void exitRoom(final String user, final String roomKey) {
 
-
         Map<String, Object> updateValues = new HashMap<>();
         updateValues.put("people/" + user + "/rooms/" + roomKey, null);
         updateValues.put("rooms/" + roomKey + "/people/ " + user, null);
@@ -203,7 +202,6 @@ public class FirebaseUtil {
             });
         }
     }
-
 
     public static void postLocation(android.location.Location location) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
